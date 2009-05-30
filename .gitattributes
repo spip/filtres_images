@@ -1,0 +1,11 @@
+* text=auto !eol
+/favicon.ico.html -text
+filtres/couleurs.php -text
+filtres/images_lib.php -text
+filtres/images_transforme.php -text
+filtres/images_typo.php -text
+/images_fonctions.php -text
+inc/filtres_images.php -text
+inc/filtres_images_compat.php -text
+modeles/favicon.html -text
+/plugin.xml -text
