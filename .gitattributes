@@ -11,8 +11,13 @@ inc/filtres_images.php -text
 inc/filtres_images_compat.php -text
 modeles/favicon.html -text
 /plugin.xml -text
+tests/_couleur_hsl2rgb.php -text
+tests/_couleur_hsv2rgb.php -text
+tests/_couleur_rgb2hsl.php -text
+tests/_couleur_rgb2hsv.php -text
 tests/couleur_extraire.php -text
 tests/degrade-bleu.jpg -text
 tests/imagesrc.html -text
 tests/imagetest.jpg -text
 tests/masque-305x85.png -text
+tests/multiple_de_trois.php -text
