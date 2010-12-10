@@ -1461,7 +1461,7 @@ function image_renforcement($im, $k=0.5)
                 if ($x+1 == $x_i) $rgb[2][1] = $rgb[1][1];
                 if ($y+1 == $y_i) $rgb[1][2] = $rgb[1][1];
 
-                $a = ($rgb[0][0] >> 24) & 0xFF;
+                $a = ($rgb[1][1] >> 24) & 0xFF;
                 $r = -$k *(($rgb[1][0] >> 16) & 0xFF) +
                          -$k *(($rgb[0][1] >> 16) & 0xFF) +
                         (1+4*$k) *(($rgb[1][1] >> 16) & 0xFF) +
