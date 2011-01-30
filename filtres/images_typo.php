@@ -518,6 +518,8 @@ function produire_image_typo() {
 	$hauteur_ligne: la hauteur de chaque ligne de texte si texte sur plusieurs lignes
 	(equivalent a "line-height")
 	$padding: forcer de l'espace autour du placement du texte; necessaire pour polices a la con qui "depassent" beaucoup de leur boite 
+	$padding_vertical: forcer de l'espace autour du placement du texte en vertical; necessaire pour polices a la con qui "depassent" beaucoup de leur boite 
+	$padding_horizontal: forcer de l'espace autour du placement du texte en horizontal; necessaire pour polices a la con qui "depassent" beaucoup de leur boite 
 	$align: alignement left, right, center
 	*/
 
@@ -565,10 +567,17 @@ function produire_image_typo() {
 	else $hauteur_ligne = 0;
 	if ($variable["padding"] > 0) $padding = $variable["padding"];
 	else $padding = 0;
-	
+	if ($variable["padding_vertical"] > 0) $padding_vertical = $variable["padding_vertical"];
+	else $padding_vertical = 0;
+	if ($variable["padding_horizontal"] > 0) $padding_horizontal = $variable["padding_horizontal"];
+	else $padding_horizontal = 0;
+	if ($padding_horizontal == 0 AND $padding_vertical == 0 AND $padding > 0) {
+		$padding_horizontal = $padding;
+		$padding_vertical = $padding;
+	}
 
 
-	$string = "$text-$taille-$couleur-$align-$police-$largeur-$hauteur_ligne-$padding";
+	$string = "$text-$taille-$couleur-$align-$police-$largeur-$hauteur_ligne-$padding-$padding_vertical-$padding_horizontal";
 	$query = md5($string);
 	$dossier = sous_repertoire(_DIR_VAR, 'cache-texte');
 	$fichier = "$dossier$query.png";
@@ -595,17 +604,17 @@ function produire_image_typo() {
 		$espace = $retour["espace"];
 		imagedestroy($imgbidon);
 
-		$im = imageCreateTrueColor($largeur_reelle-$espace+(2*$padding), $hauteur+5+(2*$padding));
+		$im = imageCreateTrueColor($largeur_reelle-$espace+(2*$padding_horizontal), $hauteur+5+(2*$padding_vertical));
 		imagealphablending ($im, FALSE );
 		imagesavealpha ( $im, TRUE );
 		
 		// Creation de quelques couleurs
 		
 		$grey2 = imagecolorallocatealpha($im, hexdec("0x{".substr($couleur, 0,2)."}"), hexdec("0x{".substr($couleur, 2,2)."}"), hexdec("0x{".substr($couleur, 4,2)."}"), 127);
-		ImageFilledRectangle ($im,0,0,$largeur_reelle+(2*$padding),$hauteur+5+(2*$padding),$grey2);
+		ImageFilledRectangle ($im,0,0,$largeur_reelle+(2*$padding_horizontal),$hauteur+5+(2*$padding_vertical),$grey2);
 		
 		// Le texte a dessiner
-		printWordWrapped($im, $taille+5+$padding, $padding, $largeur, $font, $couleur, $text, $taille, $align, $hauteur_ligne);
+		printWordWrapped($im, $taille+5+$padding_vertical, $padding_horizontal, $largeur, $font, $couleur, $text, $taille, $align, $hauteur_ligne);
 		
 		
 		// Utiliser imagepng() donnera un texte plus claire,
