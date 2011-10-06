@@ -9,6 +9,8 @@
  *  Pour plus de details voir le fichier COPYING.txt ou l'aide en ligne.   *
 \***************************************************************************/
 
+if (!defined('_ECRIRE_INC_VERSION')) return;
+
 /**
  * Toutes les fonctions image_xx de ce fichier :
  * 	- prennent une image en entree
