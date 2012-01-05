@@ -10,6 +10,7 @@ images/image_filtre-32.png -text
 /images_fonctions.php -text
 inc/filtres_images.php -text
 inc/filtres_images_compat.php -text
+lang/paquet-images.xml -text
 modeles/favicon.html -text
 tests/_couleur_hsl2rgb.php -text
 tests/_couleur_hsv2rgb.php -text
