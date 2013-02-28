@@ -1,4 +1,5 @@
 * text=auto !eol
+/apple-touch-icon.png.html -text
 /favicon.ico.html -text
 filtres/couleurs.php -text
 filtres/images_lib.php -text
