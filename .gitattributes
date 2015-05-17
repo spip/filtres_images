@@ -27,6 +27,7 @@ lang/paquet-images_pt.php -text
 lang/paquet-images_pt_br.php -text
 lang/paquet-images_ru.php -text
 lang/paquet-images_sk.php -text
+lang/paquet-images_uk.php -text
 modeles/favicon.html -text
 tests/_couleur_hsl2rgb.php -text
 tests/_couleur_hsv2rgb.php -text
