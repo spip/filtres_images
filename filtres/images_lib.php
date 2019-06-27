@@ -290,6 +290,7 @@ function _couleur_hsl2rgb($H, $S, $L) {
 // renvoit sous la forme hexadecimale ("F26C4E" par exemple).
 // Par defaut, la couleur choisie se trouve un peu au-dessus du centre de l'image.
 // On peut forcer un point en fixant $x et $y, entre 0 et 20.
+// si on passe 'moyenne' pour x alors une couleur moyenne est calculee sur les 20x20px
 // https://code.spip.net/@image_couleur_extraire
 
 function _image_couleur_extraire($img, $x = 10, $y = 6) {
@@ -333,17 +334,54 @@ function _image_couleur_extraire($img, $x = 10, $y = 6) {
 
 			imagecopyresized($thumb, $source, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
 
-			do {
-				// get a color
-				$color_index = imagecolorat($thumb, $x, $y);
+			if ($x === 'moyenne') {
+				$moyenne = null;
+				$nb_points = 0;
+				for ($x=0;$x<$newwidth;$x++) {
+					for ($y=0;$y<$newheight;$y++) {
+						// get a color
+						$color_index = imagecolorat($thumb, $x, $y);
+						// make it human readable
+						$color_tran = imagecolorsforindex($thumb, $color_index);
+						if ($color_tran['alpha'] != 127) {
+							if (is_null($moyenne)) {
+								$moyenne = $color_tran;
+							}
+							else {
+								$moyenne['red'] += $color_tran['red'];
+								$moyenne['green'] += $color_tran['green'];
+								$moyenne['blue'] += $color_tran['blue'];
+							}
+							$nb_points++;
+						}
+					}
+				}
+				if (is_null($moyenne)) {
+					$couleur = $defaut;
+				}
+				else {
+					if ($nb_points > 1) {
+						$moyenne['red'] = round($moyenne['red'] / $nb_points);
+						$moyenne['green'] = round($moyenne['green'] / $nb_points);
+						$moyenne['blue'] = round($moyenne['blue'] / $nb_points);
+					}
 
-				// make it human readable
-				$color_tran = imagecolorsforindex($thumb, $color_index);
-				$x++;
-				$y++;
-			} while ($color_tran['alpha'] == 127 and $x < $newwidth and $y < $newheight);
+					$couleur = _couleur_dec_to_hex($moyenne["red"], $moyenne["green"], $moyenne["blue"]);
+				}
+			}
+			else {
+				do {
+					// get a color
+					$color_index = imagecolorat($thumb, $x, $y);
 
-			$couleur = _couleur_dec_to_hex($color_tran["red"], $color_tran["green"], $color_tran["blue"]);
+					// make it human readable
+					$color_tran = imagecolorsforindex($thumb, $color_index);
+					$x++;
+					$y++;
+				} while ($color_tran['alpha'] == 127 and $x < $newwidth and $y < $newheight);
+
+				$couleur = _couleur_dec_to_hex($color_tran["red"], $color_tran["green"], $color_tran["blue"]);
+			}
 		} else {
 			$couleur = $defaut;
 		}
