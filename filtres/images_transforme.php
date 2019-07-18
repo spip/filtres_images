@@ -1105,20 +1105,9 @@ function image_nb($im, $val_r = 299, $val_g = 587, $val_b = 114) {
 
 	if ($creer) {
 		if ($image['format_source']==='svg'){
-			$a = [
-				'style' => "filter:grayscale(100%);"
-			];
-			$svg = svg_transformer($im, $a);
+			#$svg = svg_transformer($im, ['style' => "filter:grayscale(100%);"]); // ne semble pas fonctionner dans Safari+Chrome
+			$svg = svg_filter_grayscale($im, 1.0);
 			_image_gd_output($svg, $image);
-			/*
-			 Alternative mais fonctionne moins bien
-			$svg = svg_filtrer_couleurs($im, function($c) use ($val_r, $val_g, $val_b) {
-				$c = _couleur_hex_to_dec($c);
-				$g = round(($val_r * $c['red'] / 1000) + ($val_g * $c['green'] / 1000) + ($val_b * $c['blue'] / 1000));
-				$g = max(0,min($g, 254));
-				return '#' . _couleur_dec_to_hex($g, $g, $g);
-			});
-			*/
 		}
 		else {
 			// Creation de l'image en deux temps
@@ -1204,10 +1193,8 @@ function image_flou($im, $niveau = 3) {
 	if ($creer) {
 		if ($image['format_source']==='svg'){
 			$svg = svg_recadrer($im, $x_i + $niveau, $y_i + $niveau, -round($niveau / 2), -round($niveau / 2));
-			$a = [
-				'style' => "filter:blur({$niveau}px);"
-			];
-			$svg = svg_transformer($svg, $a);
+			#$svg = svg_transformer($svg, ['style' => "filter:blur({$niveau}px);"]); // ne semble pas supporte par safari+chrome
+			$svg = svg_filter_blur($svg, $niveau);
 			_image_gd_output($svg, $image);
 		}
 		else {
@@ -1761,11 +1748,8 @@ function image_sepia($im, $rgb = "896f5e") {
 
 	if ($creer) {
 		if ($image['format_source']==='svg'){
-			$a = [
-				'style' => "filter:sepia(1);"
-				//'filter' => "sepia(100%)" // a priori equivalent
-			];
-			$svg = svg_transformer($im, $a);
+			#$svg = svg_transformer($im, ['style' => "filter:sepia(1);"]); // ne fonctionne pas dans Chrome+Safari
+			$svg = svg_filter_sepia($im, 1);
 			_image_gd_output($svg, $image);
 		}
 		else {
