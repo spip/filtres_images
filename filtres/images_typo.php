@@ -774,7 +774,7 @@ function produire_image_typo() {
 	}
 
 
-	$dimensions = getimagesize($image);
+	$dimensions = spip_getimagesize($image);
 	$largeur = $dimensions[0];
 	$hauteur = $dimensions[1];
 

@@ -303,84 +303,97 @@ function _image_couleur_extraire($img, $x = 10, $y = 6) {
 	// valeur par defaut si l'image ne peut etre lue
 	$defaut = "F26C4E";
 
-	$cache = _image_valeurs_trans($img, "coul-$x-$y", "txt");
-	if (!$cache) {
+	$image = _image_valeurs_trans($img, "coul-$x-$y", "txt",null,false,_SVG_SUPPORTED);
+	if (!$image) {
 		return $couleur_extraite["$img-$x-$y"] = $defaut;
 	}
 
 
-	$fichier = $cache["fichier"];
-	$dest = $cache["fichier_dest"];
+	$fichier = $image["fichier"];
+	$dest = $image["fichier_dest"];
 
 	if (isset($couleur_extraite["$fichier-$x-$y"])) {
 		return $couleur_extraite["$fichier-$x-$y"];
 	}
 
-	$creer = $cache["creer"];
+	$creer = $image["creer"];
 
 	if ($creer) {
 		if (@file_exists($fichier)) {
-			$width = $cache["largeur"];
-			$height = $cache["hauteur"];
+			if ($image['format_source'] === 'svg'){
+				$couleur="eeddcc";
+				$couleurs = svg_extract_couleurs($fichier);
+				$couleurs = array_map('svg_couleur_to_rgb', $couleurs);
 
-			$newwidth = 20;
-			$newheight = 20;
-
-			$thumb = imagecreate($newwidth, $newheight);
-
-			$source = $cache["fonction_imagecreatefrom"]($fichier);
-
-			imagepalettetotruecolor($source);
-
-			imagecopyresized($thumb, $source, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
-
-			if ($x === 'moyenne') {
-				$moyenne = null;
-				$nb_points = 0;
-				for ($x=0;$x<$newwidth;$x++) {
-					for ($y=0;$y<$newheight;$y++) {
-						// get a color
-						$color_index = imagecolorat($thumb, $x, $y);
-						// make it human readable
-						$color_tran = imagecolorsforindex($thumb, $color_index);
-						if ($color_tran['alpha'] != 127) {
-							if (is_null($moyenne)) {
-								$moyenne = $color_tran;
-							}
-							else {
-								$moyenne['red'] += $color_tran['red'];
-								$moyenne['green'] += $color_tran['green'];
-								$moyenne['blue'] += $color_tran['blue'];
-							}
-							$nb_points++;
-						}
-					}
-				}
-				if (is_null($moyenne)) {
-					$couleur = $defaut;
-				}
-				else {
-					if ($nb_points > 1) {
-						$moyenne['red'] = round($moyenne['red'] / $nb_points);
-						$moyenne['green'] = round($moyenne['green'] / $nb_points);
-						$moyenne['blue'] = round($moyenne['blue'] / $nb_points);
-					}
-
-					$couleur = _couleur_dec_to_hex($moyenne["red"], $moyenne["green"], $moyenne["blue"]);
-				}
+				$totalRed = array_sum(array_column($couleurs, 'red'));
+				$totalGreen = array_sum(array_column($couleurs, 'green'));
+				$totalBlue = array_sum(array_column($couleurs, 'blue'));
+				$n = count($couleurs);
+				$couleur = _couleur_dec_to_hex(round($totalRed / $n), round($totalGreen / $n), round($totalBlue / $n));
 			}
 			else {
-				do {
-					// get a color
-					$color_index = imagecolorat($thumb, $x, $y);
+				$width = $image["largeur"];
+				$height = $image["hauteur"];
 
-					// make it human readable
-					$color_tran = imagecolorsforindex($thumb, $color_index);
-					$x++;
-					$y++;
-				} while ($color_tran['alpha'] == 127 and $x < $newwidth and $y < $newheight);
+				$newwidth = 20;
+				$newheight = 20;
 
-				$couleur = _couleur_dec_to_hex($color_tran["red"], $color_tran["green"], $color_tran["blue"]);
+				$thumb = imagecreate($newwidth, $newheight);
+
+				$source = $image["fonction_imagecreatefrom"]($fichier);
+
+				imagepalettetotruecolor($source);
+
+				imagecopyresized($thumb, $source, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+
+				if ($x === 'moyenne') {
+					$moyenne = null;
+					$nb_points = 0;
+					for ($x=0;$x<$newwidth;$x++) {
+						for ($y=0;$y<$newheight;$y++) {
+							// get a color
+							$color_index = imagecolorat($thumb, $x, $y);
+							// make it human readable
+							$color_tran = imagecolorsforindex($thumb, $color_index);
+							if ($color_tran['alpha'] != 127) {
+								if (is_null($moyenne)) {
+									$moyenne = $color_tran;
+								}
+								else {
+									$moyenne['red'] += $color_tran['red'];
+									$moyenne['green'] += $color_tran['green'];
+									$moyenne['blue'] += $color_tran['blue'];
+								}
+								$nb_points++;
+							}
+						}
+					}
+					if (is_null($moyenne)) {
+						$couleur = $defaut;
+					}
+					else {
+						if ($nb_points > 1) {
+							$moyenne['red'] = round($moyenne['red'] / $nb_points);
+							$moyenne['green'] = round($moyenne['green'] / $nb_points);
+							$moyenne['blue'] = round($moyenne['blue'] / $nb_points);
+						}
+
+						$couleur = _couleur_dec_to_hex($moyenne["red"], $moyenne["green"], $moyenne["blue"]);
+					}
+				}
+				else {
+					do {
+						// get a color
+						$color_index = imagecolorat($thumb, $x, $y);
+
+						// make it human readable
+						$color_tran = imagecolorsforindex($thumb, $color_index);
+						$x++;
+						$y++;
+					} while ($color_tran['alpha'] == 127 and $x < $newwidth and $y < $newheight);
+
+					$couleur = _couleur_dec_to_hex($color_tran["red"], $color_tran["green"], $color_tran["blue"]);
+				}
 			}
 		} else {
 			$couleur = $defaut;
