@@ -325,7 +325,7 @@ function image_alpha($im, $alpha = 63) {
  * @return string
  *     balise image recadrée
  */
-function image_recadre($im, $width, $height, $position = 'center', $background_color = 'white') {
+function image_recadre($im, $width, $height='-', $position = 'center', $background_color = 'white') {
 	$fonction = array('image_recadre', func_get_args());
 	$image = _image_valeurs_trans($im, "recadre-$width-$height-$position-$background_color", false, $fonction, false, _SVG_SUPPORTED);
 
