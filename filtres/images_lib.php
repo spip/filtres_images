@@ -323,13 +323,15 @@ function _image_couleur_extraire($img, $x = 10, $y = 6) {
 			if ($image['format_source'] === 'svg'){
 				$couleur="eeddcc";
 				$couleurs = svg_extract_couleurs($fichier);
-				$couleurs = array_map('svg_couleur_to_rgb', $couleurs);
+				if ($couleurs) {
+					$couleurs = array_map('svg_couleur_to_rgb', $couleurs);
 
-				$totalRed = array_sum(array_column($couleurs, 'red'));
-				$totalGreen = array_sum(array_column($couleurs, 'green'));
-				$totalBlue = array_sum(array_column($couleurs, 'blue'));
-				$n = count($couleurs);
-				$couleur = _couleur_dec_to_hex(round($totalRed / $n), round($totalGreen / $n), round($totalBlue / $n));
+					$totalRed = array_sum(array_column($couleurs, 'red'));
+					$totalGreen = array_sum(array_column($couleurs, 'green'));
+					$totalBlue = array_sum(array_column($couleurs, 'blue'));
+					$n = count($couleurs);
+					$couleur = _couleur_dec_to_hex(round($totalRed / $n), round($totalGreen / $n), round($totalBlue / $n));
+				}
 			}
 			else {
 				$width = $image["largeur"];
