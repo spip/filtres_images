@@ -521,6 +521,9 @@ function printWordWrapped(
 	static $memps = array();
 	$fontps = false;
 
+	// Normalisation du chemin de la police en chemin absolu (pour Windows cf https://bugs.php.net/bug.php?id=75656)
+	$font = realpath($font);
+
 	// imageftbbox exige un float, et settype aime le double pour php < 4.2.0
 	settype($textSize, 'double');
 
@@ -661,6 +664,7 @@ function produire_image_typo() {
 
 
 	// Recuperer les differents arguments
+	$variable = array();
 	$numargs = func_num_args();
 	$arg_list = func_get_args();
 	$texte = $arg_list[0];
@@ -721,7 +725,8 @@ function produire_image_typo() {
 	}
 
 
-	$string = "$text-$taille-$couleur-$align-$police-$largeur-$hauteur_ligne-$padding";
+	// Normalisation de la couleur pour ne pas produire 2 hash différents pour le nom du fichier cache
+	$string = "$text-$taille-" . strtoupper($couleur) . "-$align-$police-$largeur-$hauteur_ligne-$padding";
 	$query = md5($string);
 	$dossier = sous_repertoire(_DIR_VAR, 'cache-texte');
 	$fichier = "$dossier$query.png";
