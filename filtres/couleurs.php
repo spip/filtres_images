@@ -111,10 +111,10 @@ function couleur_eclaircir_si_foncee($couleur, $seuil = 123) {
 }
 
 /**
- * Modifie la saturation de la couleur transmise
+ * Modifie la saturation et parfois la luminosité de la couleur transmise
  *
- * Change la saturation en forçant le résultat sur une échelle absolue.
- * 
+ * Opère sur une échelle absolue.
+ *
  * @link https://www.spip.net/3326
  * @example
  *     - `[(#VAL{fc3924}|couleur_saturation{0})]` retourne blanc (ffffff),
@@ -128,25 +128,39 @@ function couleur_eclaircir_si_foncee($couleur, $seuil = 123) {
  *      Couleur en écriture hexadécimale, tel que `ff3300`
  * @param float $val
  *      Pourcentage désiré (entre 0 et 1)
+ * @param bool|string $strict
+ *      Si true, ne change que la saturation, sans toucher à la luminosité
  * @return string
  *      Couleur en écriture hexadécimale.
 **/
-function couleur_saturation($couleur, $val) {
-	$couleurs = _couleur_hex_to_dec($couleur);
-	$r = 255 - $couleurs["red"];
-	$g = 255 - $couleurs["green"];
-	$b = 255 - $couleurs["blue"];
+function couleur_saturation($couleur, $val, $strict = false) {
 
-	$max = max($r, $g, $b, 1);
+	include_spip('filtres/images_lib');
 
-	$r = 255 - $r / $max * 255 * $val;
-	$g = 255 - $g / $max * 255 * $val;
-	$b = 255 - $b / $max * 255 * $val;
+	// Soit on ne change que la saturation
+	if ($strict) {
+		$old_rgb         = _couleur_hex_to_dec($couleur);
+		$hsl             = _couleur_rgb2hsl($old_rgb['red'], $old_rgb['green'], $old_rgb['blue']);
+		$rgb             = _couleur_hsl2rgb($hsl['h'], floatval($val), $hsl['l']);
+		list($r, $g, $b) = array_values($rgb);
+
+	// Soit on joue sur la saturation et la luminosité
+	} else {
+		$couleurs = _couleur_hex_to_dec($couleur);
+		$r = 255 - $couleurs["red"];
+		$g = 255 - $couleurs["green"];
+		$b = 255 - $couleurs["blue"];
+	
+		$max = max($r, $g, $b, 1);
+	
+		$r = 255 - $r / $max * 255 * $val;
+		$g = 255 - $g / $max * 255 * $val;
+		$b = 255 - $b / $max * 255 * $val;
+	}
 
 	$couleur = _couleur_dec_to_hex($r, $g, $b);
 
 	return $couleur;
-
 }
 
 /**
