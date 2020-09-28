@@ -657,6 +657,7 @@ function produire_image_typo() {
 		'hauteur_ligne' => 0,
 		'padding' => 0,
 	);
+	$variable = [];
 
 
 	// Recuperer les differents arguments
