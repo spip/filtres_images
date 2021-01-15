@@ -37,7 +37,7 @@ include_spip('inc/filtres_images_mini');
 // https://code.spip.net/@image_aplatir
 function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, $transparence = false) {
 	if ($qualite === null) {
-		if ($format == 'jpg') {
+		if (in_array($format, ['jpg', 'webp'])) {
 			$qualite = _IMG_GD_QUALITE;
 		} elseif ($format == 'png') {
 			$qualite = 0;
