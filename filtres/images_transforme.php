@@ -445,6 +445,8 @@ function image_recadre($im, $width, $height='-', $position = 'center', $backgrou
 /**
  * Recadrer une image dans le rectangle le plus petit possible sans perte
  * de pixels non transparent
+ * Le recadrage se fait en conservant le centre de l'image : on recadre symétriquement gauche vs droite et haut vs bas
+ * TODO : proposer une option pour vraiment recadrer au plus juste, meme si ca decentre l'image
  *
  * @param string $im
  * @return string
