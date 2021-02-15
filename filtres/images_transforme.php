@@ -327,7 +327,11 @@ function image_alpha($im, $alpha = 63) {
  */
 function image_recadre($im, $width, $height='-', $position = 'center', $background_color = 'white') {
 	$fonction = array('image_recadre', func_get_args());
-	$image = _image_valeurs_trans($im, "recadre-$width-$height-$position-$background_color", false, $fonction, false, _SVG_SUPPORTED);
+
+	$forcer_format = false;
+	$background_color = strtolower(trim($background_color));
+	$position = strtolower(trim($position));
+	$image = _image_valeurs_trans($im, "recadre-$width-$height-$position-$background_color", $forcer_format, $fonction, false, _SVG_SUPPORTED);
 
 	if (!$image) {
 		return ("");
@@ -368,7 +372,13 @@ function image_recadre($im, $width, $height='-', $position = 'center', $backgrou
 
 	$offset_width = $x_i - $width;
 	$offset_height = $y_i - $height;
-	$position = strtolower($position);
+
+	if ($background_color === 'transparent') {
+		if ($width > $x_i or $height > $y_i) {
+			$forcer_format = 'png';
+			$image = _image_valeurs_trans($im, "recadre-$width-$height-$position-$background_color", $forcer_format, $fonction, false, _SVG_SUPPORTED);
+		}
+	}
 
 	// chercher une fonction spéciale de calcul des coordonnées de positionnement.
 	// exemple 'focus' ou 'focus-center' avec le plugin 'Centre Image'
