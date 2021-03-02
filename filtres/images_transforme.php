@@ -78,6 +78,9 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 		}
 		else {
 			$im = @$image["fonction_imagecreatefrom"]($im);
+			if (!$im) {
+				return "";
+			}
 			imagepalettetotruecolor($im);
 			$im_ = imagecreatetruecolor($x_i, $y_i);
 			if ($image["format_source"]=="gif" and function_exists('ImageCopyResampled')){
@@ -340,13 +343,6 @@ function image_recadre($im, $width, $height='-', $position = 'center', $backgrou
 	$x_i = $image["largeur"];
 	$y_i = $image["hauteur"];
 
-	if ($image['format_source']!=='svg' && _IMG_GD_MAX_PIXELS && $x_i * $y_i > _IMG_GD_MAX_PIXELS) {
-		spip_log("image_recadre impossible sur $im : " . $x_i * $y_i . "pixels");
-
-		// on se rabat sur une reduction CSS
-		return _image_tag_changer_taille($im, $width, $height);
-	}
-
 	// on recadre pour respecter un ratio ?
 	// width : "16:9"
 	// height : "+" pour agrandir l'image et "-" pour la croper
@@ -356,12 +352,20 @@ function image_recadre($im, $width, $height='-', $position = 'center', $backgrou
 		$ym = $y_i / $hr * $wr;
 		if ($height == "+" ? ($y_i < $hm) : ($y_i > $hm)) {
 			$width = $x_i;
-			$height = $hm;
+			$height = round($hm);
 		} else {
-			$width = $ym;
+			$width = round($ym);
 			$height = $y_i;
 		}
 	}
+
+	if ($image['format_source']!=='svg' && _IMG_GD_MAX_PIXELS && $x_i * $y_i > _IMG_GD_MAX_PIXELS) {
+		spip_log("image_recadre impossible sur $im : " . $x_i * $y_i . "pixels");
+
+		// on se rabat sur une reduction CSS
+		return _image_tag_changer_taille($im, $width, $height);
+	}
+
 
 	if ($width == 0) {
 		$width = $x_i;
@@ -427,6 +431,9 @@ function image_recadre($im, $width, $height='-', $position = 'center', $backgrou
 		}
 		else {
 			$im = $image["fonction_imagecreatefrom"]($im);
+			if (!$im) {
+				return "";
+			}
 			imagepalettetotruecolor($im);
 			$im_ = imagecreatetruecolor($width, $height);
 			@imagealphablending($im_, false);
