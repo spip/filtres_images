@@ -108,14 +108,15 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 
 			imagefill($im_, 0, 0, $color_t);
 
-			//??
-			//$dist = abs($trait);
-
 			$transp_x = false;
 
-			if ($image["format_source"]=="jpg"){
-				$im_ = &$im;
-			} else {
+			if ($image["format_source"] == "jpg"){
+				imagedestroy($im_);
+				$im_ = $im;
+			}
+			else {
+				$has_transparent = false;
+				imagecopy($im_, $im, 0, 0, 0, 0, $x_i, $y_i);
 				for ($x = 0; $x<$x_i; $x++){
 					for ($y = 0; $y<$y_i; $y++){
 
@@ -125,14 +126,10 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 						$g = ($rgb >> 8) & 0xFF;
 						$b = $rgb & 0xFF;
 
-						$a = (127-$a)/127;
-
-						if ($a==1){ // Limiter calculs
-							$r = $r;
-							$g = $g;
-							$b = $b;
-						} else {
-							if ($a==0){ // Limiter calculs
+						if ($a > 0) {
+							$has_transparent = true;
+							// transparence complete
+							if ($a == 127){
 								$r = $dr;
 								$g = $dv;
 								$b = $db;
@@ -141,31 +138,42 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 								$transp_y = $y;
 
 							} else {
-								$r = round($a*$r+$dr*(1-$a));
-								$g = round($a*$g+$dv*(1-$a));
-								$b = round($a*$b+$db*(1-$a));
+								$p = (127-$a)/127;
+								$r = round($p*$r + $dr*(1-$p));
+								$g = round($p*$g + $dv*(1-$p));
+								$b = round($p*$b + $db*(1-$p));
 							}
+
+							if ($transparence){
+								$a = (1-$a)*127;
+								$color = ImageColorAllocateAlpha($im_, $r, $g, $b, $a);
+							}
+							else {
+								$color = ImageColorAllocate($im_, $r, $g, $b);
+							}
+							imagesetpixel($im_, $x, $y, $color);
 						}
-						$a = (1-$a)*127;
-						$color = ImageColorAllocateAlpha($im_, $r, $g, $b, $a);
-						imagesetpixel($im_, $x, $y, $color);
+
 					}
 				}
+				// si on avait aucun pixel transparent, reprendre l'image d'origine telle quelle
+				if (!$has_transparent) {
+					imagedestroy($im_);
+					$im_ = $im;
+				}
 			}
+
 			// passer en palette si besoin
 			if ($format=='gif' or ($format=='png' and $qualite!==0)){
 				// creer l'image finale a palette
 				// (on recycle l'image initiale si possible, sinon on en recree une)
-				if ($im===$im_){
-					$im = imagecreatetruecolor($x_i, $y_i);
-				}
+				$im = imagecreatetruecolor($x_i, $y_i);
 
+				// copier l'image true color
+				imagecopy($im, $im_, 0, 0, 0, 0, $x_i, $y_i);
+				// et la transformer en palette
 				@imagetruecolortopalette($im, true, $qualite);
 
-
-				//$im = imagecreate($x_i, $y_i);
-				// copier l'image true color vers la palette
-				imagecopy($im, $im_, 0, 0, 0, 0, $x_i, $y_i);
 				// matcher les couleurs au mieux par rapport a l'image initiale
 				// si la fonction est disponible (php>=4.3)
 				if (function_exists('imagecolormatch')){
@@ -178,7 +186,6 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 						@imagecolortransparent($im, $color_t);
 					}
 				}
-
 
 				// produire le resultat
 				_image_gd_output($im, $image, $qualite);
