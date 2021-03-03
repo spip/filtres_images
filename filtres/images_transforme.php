@@ -1646,7 +1646,16 @@ function image_imagick() {
 	$creer = $image["creer"];
 
 	if ($creer) {
-		if (function_exists($fonc)) {
+		if (method_exists('Imagick',$fonc)) {
+			$imagick = new Imagick();
+			$imagick->readImage($im);
+			$args = $tous;
+			array_shift($args);
+			array_shift($args);
+			call_user_func_array([$imagick, $fonc], $args);
+			_image_gd_output($imagick, $image, _IMG_GD_QUALITE, '_image_imagick_write');
+		}
+		elseif (function_exists($fonc)) {
 
 			$handle = imagick_readimage($im);
 			$arr[0] = $handle;
@@ -1654,18 +1663,51 @@ function image_imagick() {
 				$arr[] = $tous[$i];
 			}
 			call_user_func_array($fonc, $arr);
-			// Creer image dans fichier temporaire, puis renommer vers "bon" fichier
-			// de facon a eviter time_out pendant creation de l'image definitive
-			$tmp = preg_replace(",[.]png$,i", "-tmp.png", $dest);
-			imagick_writeimage($handle, $tmp);
-			rename($tmp, $dest);
-			ecrire_fichier($dest . ".src", serialize($image));
+			_image_gd_output($handle, $image, _IMG_GD_QUALITE, '_image_imagick_write');
 		}
 	}
 	list($src_y, $src_x) = taille_image($dest);
 
 	return _image_ecrire_tag($image, array('src' => $dest, 'width' => $src_x, 'height' => $src_y));
 
+}
+
+
+/**
+ * Affiche ou sauvegarde une image au format WEBP
+ *
+ * Utilise les fonctions spécifiques GD.
+ *
+ * @param resource $img
+ *     Une ressource de type Imagick ou handle
+ * @param string $fichier
+ *     Le path vers l'image (ex : local/cache-vignettes/L180xH51/image.png).
+ * @return bool
+ *
+ *     - false si l'image créée a une largeur nulle ou n'existe pas ;
+ *     - true si une image est bien retournée.
+ */
+function _image_imagick_write($imagick, $fichier, $qualite = _IMG_GD_QUALITE) {
+	$tmp = $fichier . ".tmp";
+	if (is_a($imagick, 'Imagick')) {
+		$ret = $imagick->writeImage($tmp);
+	}
+	else {
+		$ret = imagick_writeimage($imagick, $tmp);
+	}
+	if (file_exists($tmp)) {
+		$taille_test = getimagesize($tmp);
+		if ($taille_test[0] < 1) {
+			return false;
+		}
+
+		spip_unlink($fichier); // le fichier peut deja exister
+		@rename($tmp, $fichier);
+
+		return $ret;
+	}
+
+	return false;
 }
 
 // Permet de rendre une image
