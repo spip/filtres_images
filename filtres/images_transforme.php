@@ -145,7 +145,6 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 							}
 
 							if ($transparence){
-								$a = (1-$a)*127;
 								$color = ImageColorAllocateAlpha($im_, $r, $g, $b, $a);
 							}
 							else {
