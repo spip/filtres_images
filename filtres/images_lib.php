@@ -161,7 +161,8 @@ function _couleur_hsv2rgb($H, $S, $V) {
  * HSL float entre 0 et 1
  * RGB entiers entre 0 et 255
  *
- * @deprecated use _couleur_rgb_to_hsl()
+ * @deprecated 3.0 (pour SPIP4)
+ * @uses _couleur_rgb_to_hsl()
  * @param int $R
  * @param int $G
  * @param int $B
@@ -177,7 +178,8 @@ function _couleur_rgb2hsl($R, $G, $B) {
  * HSL float entre 0 et 1
  * RGB entiers entre 0 et 255
  *
- * @deprecated use _couleur_hsl_to_rgb()
+ * @deprecated 3.0 (pour SPIP4)
+ * @uses _couleur_hsl_to_rgb()
  * @param float $H
  * @param float $S
  * @param float $L
