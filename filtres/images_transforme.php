@@ -385,7 +385,9 @@ function image_recadre($im, $width, $height='-', $position = 'center', $backgrou
 
 	if ($background_color === 'transparent') {
 		if ($width > $x_i or $height > $y_i) {
-			$forcer_format = 'png';
+			if ($image['format_source'] !== 'svg') {
+				$forcer_format = 'png';
+			}
 			$image = _image_valeurs_trans($im, "recadre-$width-$height-$position-$background_color", $forcer_format, $fonction, false, _SVG_SUPPORTED);
 		}
 	}
