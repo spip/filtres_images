@@ -1,4 +1,5 @@
 <?php
+
 /***************************************************************************\
  *  SPIP, Système de publication pour l'internet                           *
  *                                                                         *
@@ -67,9 +68,9 @@ function couleur_extreme($couleur, $limite = 0.5) {
 	// -> la limite est une valeur de 0 a 255, permettant de regler le point limite entre le passage noir ou blanc
 
 	if (couleur_luminance_relative($couleur) > $limite) {
-		$couleur_texte = "ffffff";
+		$couleur_texte = 'ffffff';
 	} else {
-		$couleur_texte = "000000";
+		$couleur_texte = '000000';
 	}
 
 	return $couleur_texte;
@@ -78,9 +79,9 @@ function couleur_extreme($couleur, $limite = 0.5) {
 // https://code.spip.net/@couleur_inverser
 function couleur_inverser($couleur) {
 	$couleurs = _couleur_hex_to_dec($couleur);
-	$red = 255 - $couleurs["red"];
-	$green = 255 - $couleurs["green"];
-	$blue = 255 - $couleurs["blue"];
+	$red = 255 - $couleurs['red'];
+	$green = 255 - $couleurs['green'];
+	$blue = 255 - $couleurs['blue'];
 
 	$couleur = _couleur_dec_to_hex($red, $green, $blue);
 
@@ -90,10 +91,10 @@ function couleur_inverser($couleur) {
 // https://code.spip.net/@couleur_foncer_si_claire
 function couleur_foncer_si_claire($couleur, $seuil = 122) {
 	// ne foncer que les couleurs claires
-	// utile pour ecrire sur fond blanc, 
+	// utile pour ecrire sur fond blanc,
 	// mais sans changer quand la couleur est deja foncee
 	if (couleur_luminance_relative($couleur) > $seuil / 255) {
-		include_spip("inc/filtres_images_mini");
+		include_spip('inc/filtres_images_mini');
 		return couleur_foncer($couleur);
 	} else {
 		return $couleur;
@@ -103,7 +104,7 @@ function couleur_foncer_si_claire($couleur, $seuil = 122) {
 // https://code.spip.net/@couleur_eclaircir_si_foncee
 function couleur_eclaircir_si_foncee($couleur, $seuil = 123) {
 	if (couleur_luminance_relative($couleur) < $seuil / 255) {
-		include_spip("inc/filtres_images_mini");
+		include_spip('inc/filtres_images_mini');
 		return couleur_eclaircir($couleur);
 	} else {
 		return $couleur;
@@ -120,10 +121,10 @@ function couleur_eclaircir_si_foncee($couleur, $seuil = 123) {
  *     - `[(#VAL{fc3924}|couleur_saturation{0})]` retourne blanc (ffffff),
  *     - `[(#VAL{fc3924}|couleur_saturation{1})]` retourne la couleur avec sa saturation au maximum (fb1800)
  *     - `[(#VAL{fc3924}|couleur_saturation{0.2})]` retourne la couleur avec 20% de saturation (fed0cc)
- * 
+ *
  * @uses _couleur_hex_to_dec()
  * @uses _couleur_dec_to_hex()
- * 
+ *
  * @param string $couleur
  *      Couleur en écriture hexadécimale, tel que `ff3300`
  * @param float $val
@@ -147,12 +148,12 @@ function couleur_saturation($couleur, $val, $strict = false) {
 	// Soit on joue sur la saturation et la luminosité
 	} else {
 		$couleurs = _couleur_hex_to_dec($couleur);
-		$r = 255 - $couleurs["red"];
-		$g = 255 - $couleurs["green"];
-		$b = 255 - $couleurs["blue"];
-	
+		$r = 255 - $couleurs['red'];
+		$g = 255 - $couleurs['green'];
+		$b = 255 - $couleurs['blue'];
+
 		$max = max($r, $g, $b, 1);
-	
+
 		$r = 255 - $r / $max * 255 * $val;
 		$g = 255 - $g / $max * 255 * $val;
 		$b = 255 - $b / $max * 255 * $val;
@@ -167,20 +168,20 @@ function couleur_saturation($couleur, $val, $strict = false) {
  * Modifie la luminance de la couleur transmise
  *
  * Change la luminance en forçant le résultat sur une échelle absolue.
- * 
+ *
  * @link https://www.spip.net/3326
  * @example
  *     - `[(#VAL{fc3924}|couleur_luminance{0})]` retourne blanc (ffffff),
  *     - `[(#VAL{fc3924}|couleur_luminance{1})]` retourne noir (000000)
  *     - `[(#VAL{fc3924}|couleur_luminance{0.5})]` retourne une luminance moyenne (fb1b03)
  *     - `[(#VAL{fc3924}|couleur_luminance{0.2})]` retourne la couleur avec 20% de luminance (fda49a)
- * 
+ *
  * @uses _couleur_hex_to_dec()
  * @uses couleur_saturation()
  * @uses _couleur_rgb2hsl()
  * @uses _couleur_hsl2rgb()
  * @uses _couleur_dec_to_hex()
- * 
+ *
  * @param string $couleur
  *      Couleur en écriture hexadécimale, tel que `ff3300`
  * @param float $val
@@ -192,9 +193,9 @@ function couleur_luminance($couleur, $val) {
 	include_spip('filtres/images_lib');
 
 	$couleurs = _couleur_hex_to_dec($couleur);
-	$r = $couleurs["red"];
-	$g = $couleurs["green"];
-	$b = $couleurs["blue"];
+	$r = $couleurs['red'];
+	$g = $couleurs['green'];
+	$b = $couleurs['blue'];
 
 	// Cas etonnant: quand gris parfait, la correction de HSL ne fonctionne pas
 	// en revanche, couleur_saturation retourne exactement la bonne valeur
@@ -204,14 +205,14 @@ function couleur_luminance($couleur, $val) {
 
 
 	$couleur = _couleur_rgb2hsl($r, $g, $b);
-	$h = $couleur["h"];
-	$s = $couleur["s"];
-	$l = $couleur["l"];
+	$h = $couleur['h'];
+	$s = $couleur['s'];
+	$l = $couleur['l'];
 
 	$rgb = _couleur_hsl2rgb($h, $s, 1 - $val);
-	$r = $rgb["r"];
-	$g = $rgb["g"];
-	$b = $rgb["b"];
+	$r = $rgb['r'];
+	$g = $rgb['g'];
+	$b = $rgb['b'];
 
 	$retour = _couleur_dec_to_hex($r, $g, $b);
 

@@ -68,9 +68,9 @@ $GLOBALS['spip_matrice']['_image_decale_composante_127'] = 'filtres/images_lib.p
 /**
  * Créer une image typo
  *
- * @note 
- *    Cas particulier historique : son nom commence par "image_" 
- *    mais s'applique sur un texte… 
+ * @note
+ *    Cas particulier historique : son nom commence par "image_"
+ *    mais s'applique sur un texte…
  * @return string
  */
 function image_typo() {

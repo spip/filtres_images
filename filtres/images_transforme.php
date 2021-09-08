@@ -1,4 +1,5 @@
 <?php
+
 /***************************************************************************\
  *  SPIP, Système de publication pour l'internet                           *
  *                                                                         *
@@ -46,7 +47,7 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 		}
 	}
 
-	$fonction = array('image_aplatir', func_get_args());
+	$fonction = ['image_aplatir', func_get_args()];
 	$image = _image_valeurs_trans($im, "aplatir-$format-$coul-$qualite-$transparence", $format, $fonction, '', _SVG_SUPPORTED);
 	if ($image['format_source'] === 'svg') {
 		// ne pas forcer le format
@@ -54,42 +55,42 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 	}
 
 	if (!$image) {
-		return ("");
+		return ('');
 	}
 
 	include_spip('inc/filtres');
 	$couleurs = _couleur_hex_to_dec($coul);
-	$dr = $couleurs["red"];
-	$dv = $couleurs["green"];
-	$db = $couleurs["blue"];
+	$dr = $couleurs['red'];
+	$dv = $couleurs['green'];
+	$db = $couleurs['blue'];
 
-	$x_i = $image["largeur"];
-	$y_i = $image["hauteur"];
+	$x_i = $image['largeur'];
+	$y_i = $image['hauteur'];
 
-	$im = $image["fichier"];
-	$dest = $image["fichier_dest"];
+	$im = $image['fichier'];
+	$dest = $image['fichier_dest'];
 
-	$creer = $image["creer"];
+	$creer = $image['creer'];
 
 	if ($creer) {
-		if ($image['format_source'] === 'svg'){
+		if ($image['format_source'] === 'svg') {
 			$svg = svg_ajouter_background($im, $coul);
 			_image_gd_output($svg, $image);
 		}
 		else {
-			$im = @$image["fonction_imagecreatefrom"]($im);
+			$im = @$image['fonction_imagecreatefrom']($im);
 			if (!$im) {
-				return "";
+				return '';
 			}
 			imagepalettetotruecolor($im);
 			$im_ = imagecreatetruecolor($x_i, $y_i);
-			if ($image["format_source"]=="gif" and function_exists('ImageCopyResampled')){
+			if ($image['format_source'] == 'gif' and function_exists('ImageCopyResampled')) {
 				// Si un GIF est transparent,
 				// fabriquer un PNG transparent
 				// Conserver la transparence
 				@imagealphablending($im_, false);
 				@imagesavealpha($im_, true);
-				if (function_exists("imageAntiAlias")){
+				if (function_exists('imageAntiAlias')) {
 					imageAntiAlias($im_, true);
 				}
 				@ImageCopyResampled($im_, $im, 0, 0, 0, 0, $x_i, $y_i, $x_i, $y_i);
@@ -98,7 +99,7 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 			}
 
 			// allouer la couleur de fond
-			if ($transparence){
+			if ($transparence) {
 				@imagealphablending($im_, false);
 				@imagesavealpha($im_, true);
 				$color_t = imagecolorallocatealpha($im_, $dr, $dv, $db, 127);
@@ -110,16 +111,15 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 
 			$transp_x = false;
 
-			if ($image["format_source"] == "jpg"){
+			if ($image['format_source'] == 'jpg') {
 				imagedestroy($im_);
 				$im_ = $im;
 			}
 			else {
 				$has_transparent = false;
 				imagecopy($im_, $im, 0, 0, 0, 0, $x_i, $y_i);
-				for ($x = 0; $x<$x_i; $x++){
-					for ($y = 0; $y<$y_i; $y++){
-
+				for ($x = 0; $x < $x_i; $x++) {
+					for ($y = 0; $y < $y_i; $y++) {
 						$rgb = ImageColorAt($im, $x, $y);
 						$a = ($rgb >> 24) & 0xFF;
 						$r = ($rgb >> 16) & 0xFF;
@@ -129,22 +129,21 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 						if ($a > 0) {
 							$has_transparent = true;
 							// transparence complete
-							if ($a == 127){
+							if ($a == 127) {
 								$r = $dr;
 								$g = $dv;
 								$b = $db;
 
 								$transp_x = $x; // Memoriser un point transparent
 								$transp_y = $y;
-
 							} else {
-								$p = (127-$a)/127;
-								$r = round($p*$r + $dr*(1-$p));
-								$g = round($p*$g + $dv*(1-$p));
-								$b = round($p*$b + $db*(1-$p));
+								$p = (127 - $a) / 127;
+								$r = round($p * $r + $dr * (1 - $p));
+								$g = round($p * $g + $dv * (1 - $p));
+								$b = round($p * $b + $db * (1 - $p));
 							}
 
-							if ($transparence){
+							if ($transparence) {
 								$color = ImageColorAllocateAlpha($im_, $r, $g, $b, $a);
 							}
 							else {
@@ -152,7 +151,6 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 							}
 							imagesetpixel($im_, $x, $y, $color);
 						}
-
 					}
 				}
 				// si on avait aucun pixel transparent, reprendre l'image d'origine telle quelle
@@ -163,7 +161,7 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 			}
 
 			// passer en palette si besoin
-			if ($format=='gif' or ($format=='png' and $qualite!==0)){
+			if ($format == 'gif' or ($format == 'png' and $qualite !== 0)) {
 				// creer l'image finale a palette
 				// (on recycle l'image initiale si possible, sinon on en recree une)
 				$im = imagecreatetruecolor($x_i, $y_i);
@@ -175,13 +173,13 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 
 				// matcher les couleurs au mieux par rapport a l'image initiale
 				// si la fonction est disponible (php>=4.3)
-				if (function_exists('imagecolormatch')){
+				if (function_exists('imagecolormatch')) {
 					@imagecolormatch($im_, $im);
 				}
 
-				if ($format=='gif' && $transparence && $transp_x){
+				if ($format == 'gif' && $transparence && $transp_x) {
 					$color_t = ImagecolorAt($im, $transp_x, $transp_y);
-					if ($format=="gif" && $transparence){
+					if ($format == 'gif' && $transparence) {
 						@imagecolortransparent($im, $color_t);
 					}
 				}
@@ -191,14 +189,14 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 			} else {
 				_image_gd_output($im_, $image, $qualite);
 			}
-			if ($im!==$im_){
+			if ($im !== $im_) {
 				imagedestroy($im);
 			}
 			imagedestroy($im_);
 		}
 	}
 
-	return _image_ecrire_tag($image, array('src' => $dest));
+	return _image_ecrire_tag($image, ['src' => $dest]);
 }
 
 
@@ -222,29 +220,29 @@ function image_format($img, $format = 'png') {
 // alpha = 127: completement transparent
 // https://code.spip.net/@image_alpha
 function image_alpha($im, $alpha = 63) {
-	$fonction = array('image_alpha', func_get_args());
-	$image = _image_valeurs_trans($im, "alpha-$alpha", "png", $fonction, false, _SVG_SUPPORTED);
+	$fonction = ['image_alpha', func_get_args()];
+	$image = _image_valeurs_trans($im, "alpha-$alpha", 'png', $fonction, false, _SVG_SUPPORTED);
 	if (!$image) {
-		return ("");
+		return ('');
 	}
 	if ($image['format_source'] === 'svg') {
 		// ne pas forcer le format
 		$image = _image_valeurs_trans($im, "alpha-$alpha", false, $fonction, '', _SVG_SUPPORTED);
 	}
 
-	$x_i = $image["largeur"];
-	$y_i = $image["hauteur"];
+	$x_i = $image['largeur'];
+	$y_i = $image['hauteur'];
 
-	$im = $image["fichier"];
-	$dest = $image["fichier_dest"];
+	$im = $image['fichier'];
+	$dest = $image['fichier_dest'];
 
-	$creer = $image["creer"];
+	$creer = $image['creer'];
 
 	if ($creer) {
-		if ($image['format_source'] === 'svg'){
+		if ($image['format_source'] === 'svg') {
 			$atts = [];
 			if ($alpha > 0) {
-				$atts['opacity'] = round((127-$alpha) / 127.0, 2);
+				$atts['opacity'] = round((127 - $alpha) / 127.0, 2);
 			}
 			$svg = svg_transformer($im, $atts);
 			_image_gd_output($svg, $image);
@@ -252,7 +250,7 @@ function image_alpha($im, $alpha = 63) {
 		else {
 			// Creation de l'image en deux temps
 			// de facon a conserver les GIF transparents
-			$im = $image["fonction_imagecreatefrom"]($im);
+			$im = $image['fonction_imagecreatefrom']($im);
 			imagepalettetotruecolor($im);
 			$im2 = imagecreatetruecolor($x_i, $y_i);
 			@imagealphablending($im2, false);
@@ -290,7 +288,7 @@ function image_alpha($im, $alpha = 63) {
 		}
 	}
 
-	return _image_ecrire_tag($image, array('src' => $dest));
+	return _image_ecrire_tag($image, ['src' => $dest]);
 }
 
 /**
@@ -334,8 +332,8 @@ function image_alpha($im, $alpha = 63) {
  * @return string
  *     balise image recadrée
  */
-function image_recadre($im, $width, $height='-', $position = 'center', $background_color = 'white') {
-	$fonction = array('image_recadre', func_get_args());
+function image_recadre($im, $width, $height = '-', $position = 'center', $background_color = 'white') {
+	$fonction = ['image_recadre', func_get_args()];
 
 	$forcer_format = false;
 	$background_color = strtolower(trim($background_color));
@@ -343,20 +341,20 @@ function image_recadre($im, $width, $height='-', $position = 'center', $backgrou
 	$image = _image_valeurs_trans($im, "recadre-$width-$height-$position-$background_color", $forcer_format, $fonction, false, _SVG_SUPPORTED);
 
 	if (!$image) {
-		return ("");
+		return ('');
 	}
 
-	$x_i = $image["largeur"];
-	$y_i = $image["hauteur"];
+	$x_i = $image['largeur'];
+	$y_i = $image['hauteur'];
 
 	// on recadre pour respecter un ratio ?
 	// width : "16:9"
 	// height : "+" pour agrandir l'image et "-" pour la croper
-	if (strpos($width, ":") !== false) {
-		list($wr, $hr) = explode(":", $width);
+	if (strpos($width, ':') !== false) {
+		list($wr, $hr) = explode(':', $width);
 		$hm = $x_i / $wr * $hr;
 		$ym = $y_i / $hr * $wr;
-		if ($height == "+" ? ($y_i < $hm) : ($y_i > $hm)) {
+		if ($height == '+' ? ($y_i < $hm) : ($y_i > $hm)) {
 			$width = $x_i;
 			$height = round($hm);
 		} else {
@@ -365,8 +363,8 @@ function image_recadre($im, $width, $height='-', $position = 'center', $backgrou
 		}
 	}
 
-	if ($image['format_source']!=='svg' && _IMG_GD_MAX_PIXELS && $x_i * $y_i > _IMG_GD_MAX_PIXELS) {
-		spip_log("image_recadre impossible sur $im : " . $x_i * $y_i . "pixels");
+	if ($image['format_source'] !== 'svg' && _IMG_GD_MAX_PIXELS && $x_i * $y_i > _IMG_GD_MAX_PIXELS) {
+		spip_log("image_recadre impossible sur $im : " . $x_i * $y_i . 'pixels');
 
 		// on se rabat sur une reduction CSS
 		return _image_tag_changer_taille($im, $width, $height);
@@ -394,9 +392,9 @@ function image_recadre($im, $width, $height='-', $position = 'center', $backgrou
 
 	// chercher une fonction spéciale de calcul des coordonnées de positionnement.
 	// exemple 'focus' ou 'focus-center' avec le plugin 'Centre Image'
-	if (!in_array($position, array('center', 'top', 'right', 'bottom', 'left'))) {
-		if (count(explode(" ", $position)) == 1) {
-			$positionner = charger_fonction("image_positionner_par_" . str_replace("-", "_", $position), "inc", true);
+	if (!in_array($position, ['center', 'top', 'right', 'bottom', 'left'])) {
+		if (count(explode(' ', $position)) == 1) {
+			$positionner = charger_fonction('image_positionner_par_' . str_replace('-', '_', $position), 'inc', true);
 			if ($positionner) {
 				$position = $positionner($im, $width, $height);
 			}
@@ -427,10 +425,10 @@ function image_recadre($im, $width, $height='-', $position = 'center', $backgrou
 		$offset_height = intval(ceil($offset_height / 2));
 	}
 
-	$im = $image["fichier"];
-	$dest = $image["fichier_dest"];
+	$im = $image['fichier'];
+	$dest = $image['fichier_dest'];
 
-	$creer = $image["creer"];
+	$creer = $image['creer'];
 
 	if ($creer) {
 		if ($image['format_source'] === 'svg') {
@@ -438,9 +436,9 @@ function image_recadre($im, $width, $height='-', $position = 'center', $backgrou
 			_image_gd_output($svg, $image);
 		}
 		else {
-			$im = $image["fonction_imagecreatefrom"]($im);
+			$im = $image['fonction_imagecreatefrom']($im);
 			if (!$im) {
-				return "";
+				return '';
 			}
 			imagepalettetotruecolor($im);
 			$im_ = imagecreatetruecolor($width, $height);
@@ -454,8 +452,16 @@ function image_recadre($im, $width, $height='-', $position = 'center', $backgrou
 				$color_t = imagecolorallocate($im_, $bg['red'], $bg['green'], $bg['blue']);
 			}
 			imagefill($im_, 0, 0, $color_t);
-			imagecopy($im_, $im, max(0, -$offset_width), max(0, -$offset_height), max(0, $offset_width), max(0, $offset_height),
-				min($width, $x_i), min($height, $y_i));
+			imagecopy(
+				$im_,
+				$im,
+				max(0, -$offset_width),
+				max(0, -$offset_height),
+				max(0, $offset_width),
+				max(0, $offset_height),
+				min($width, $x_i),
+				min($height, $y_i)
+			);
 
 			_image_gd_output($im_, $image);
 			imagedestroy($im_);
@@ -463,7 +469,7 @@ function image_recadre($im, $width, $height='-', $position = 'center', $backgrou
 		}
 	}
 
-	return _image_ecrire_tag($image, array('src' => $dest, 'width' => $width, 'height' => $height));
+	return _image_ecrire_tag($image, ['src' => $dest, 'width' => $width, 'height' => $height]);
 }
 
 
@@ -477,22 +483,22 @@ function image_recadre($im, $width, $height='-', $position = 'center', $backgrou
  * @return string
  */
 function image_recadre_mini($im) {
-	$fonction = array('image_recadre_mini', func_get_args());
-	$image = _image_valeurs_trans($im, "recadre_mini", false, $fonction);
+	$fonction = ['image_recadre_mini', func_get_args()];
+	$image = _image_valeurs_trans($im, 'recadre_mini', false, $fonction);
 
 	if (!$image) {
-		return ("");
+		return ('');
 	}
 
-	$width = $image["largeur"];
-	$height = $image["hauteur"];
+	$width = $image['largeur'];
+	$height = $image['hauteur'];
 
-	$im = $image["fichier"];
-	$dest = $image["fichier_dest"];
+	$im = $image['fichier'];
+	$dest = $image['fichier_dest'];
 
-	$creer = $image["creer"];
+	$creer = $image['creer'];
 	if ($creer) {
-		$im = $image["fonction_imagecreatefrom"]($im);
+		$im = $image['fonction_imagecreatefrom']($im);
 		imagepalettetotruecolor($im);
 
 		// trouver le rectangle mini qui contient des infos de couleur
@@ -574,33 +580,33 @@ function image_recadre_mini($im) {
 		list($height, $width) = taille_image($image['fichier_dest']);
 	}
 
-	return _image_ecrire_tag($image, array('src' => $dest, 'width' => $width, 'height' => $height));
+	return _image_ecrire_tag($image, ['src' => $dest, 'width' => $width, 'height' => $height]);
 }
 
 
 // https://code.spip.net/@image_flip_vertical
 function image_flip_vertical($im) {
-	$fonction = array('image_flip_vertical', func_get_args());
-	$image = _image_valeurs_trans($im, "flip_v", false, $fonction,'', _SVG_SUPPORTED);
+	$fonction = ['image_flip_vertical', func_get_args()];
+	$image = _image_valeurs_trans($im, 'flip_v', false, $fonction, '', _SVG_SUPPORTED);
 	if (!$image) {
-		return ("");
+		return ('');
 	}
 
-	$x_i = $image["largeur"];
-	$y_i = $image["hauteur"];
+	$x_i = $image['largeur'];
+	$y_i = $image['hauteur'];
 
-	$im = $image["fichier"];
-	$dest = $image["fichier_dest"];
+	$im = $image['fichier'];
+	$dest = $image['fichier_dest'];
 
-	$creer = $image["creer"];
+	$creer = $image['creer'];
 
 	if ($creer) {
-		if ($image['format_source'] === 'svg'){
+		if ($image['format_source'] === 'svg') {
 			$svg = svg_flip($im, 'v');
 			_image_gd_output($svg, $image);
 		}
 		else {
-			$im = $image["fonction_imagecreatefrom"]($im);
+			$im = $image['fonction_imagecreatefrom']($im);
 			imagepalettetotruecolor($im);
 			$im_ = imagecreatetruecolor($x_i, $y_i);
 			@imagealphablending($im_, false);
@@ -621,31 +627,31 @@ function image_flip_vertical($im) {
 		}
 	}
 
-	return _image_ecrire_tag($image, array('src' => $dest));
+	return _image_ecrire_tag($image, ['src' => $dest]);
 }
 
 // https://code.spip.net/@image_flip_horizontal
 function image_flip_horizontal($im) {
-	$fonction = array('image_flip_horizontal', func_get_args());
-	$image = _image_valeurs_trans($im, "flip_h", false, $fonction, '', _SVG_SUPPORTED);
+	$fonction = ['image_flip_horizontal', func_get_args()];
+	$image = _image_valeurs_trans($im, 'flip_h', false, $fonction, '', _SVG_SUPPORTED);
 	if (!$image) {
-		return ("");
+		return ('');
 	}
 
-	$x_i = $image["largeur"];
-	$y_i = $image["hauteur"];
+	$x_i = $image['largeur'];
+	$y_i = $image['hauteur'];
 
-	$im = $image["fichier"];
-	$dest = $image["fichier_dest"];
+	$im = $image['fichier'];
+	$dest = $image['fichier_dest'];
 
-	$creer = $image["creer"];
+	$creer = $image['creer'];
 
-	if ($creer){
-		if ($image['format_source']==='svg'){
+	if ($creer) {
+		if ($image['format_source'] === 'svg') {
 			$svg = svg_flip($im, 'h');
 			_image_gd_output($svg, $image);
 		} else {
-			$im = $image["fonction_imagecreatefrom"]($im);
+			$im = $image['fonction_imagecreatefrom']($im);
 			imagepalettetotruecolor($im);
 			$im_ = imagecreatetruecolor($x_i, $y_i);
 			@imagealphablending($im_, false);
@@ -654,9 +660,9 @@ function image_flip_horizontal($im) {
 			$color_t = ImageColorAllocateAlpha($im_, 255, 255, 255, 127);
 			imagefill($im_, 0, 0, $color_t);
 
-			for ($x = 0; $x<$x_i; $x++){
-				for ($y = 0; $y<$y_i; $y++){
-					imagecopy($im_, $im, $x, $y_i-$y-1, $x, $y, 1, 1);
+			for ($x = 0; $x < $x_i; $x++) {
+				for ($y = 0; $y < $y_i; $y++) {
+					imagecopy($im_, $im, $x, $y_i - $y - 1, $x, $y, 1, 1);
 				}
 			}
 			_image_gd_output($im_, $image);
@@ -665,11 +671,11 @@ function image_flip_horizontal($im) {
 		}
 	}
 
-	return _image_ecrire_tag($image, array('src' => $dest));
+	return _image_ecrire_tag($image, ['src' => $dest]);
 }
 
 // https://code.spip.net/@image_masque
-function image_masque($im, $masque, $pos = "") {
+function image_masque($im, $masque, $pos = '') {
 	// Passer, en plus de l'image d'origine,
 	// une image de "masque": un fichier PNG24 transparent.
 	// Le decoupage se fera selon la transparence du "masque",
@@ -682,7 +688,7 @@ function image_masque($im, $masque, $pos = "") {
 	// $pos est une variable libre, qui permet de passer left=..., right=..., bottom=..., top=...
 	// dans ce cas, le masque est place a ces positions sur l'image d'origine,
 	// et evidemment cette image d'origine n'est pas redimensionnee
-	// 
+	//
 	// Positionnement horizontal: text-align=left, right, center
 	// Positionnement vertical : vertical-align=top, bottom, middle
 	// (les positionnements left, right, top, left sont relativement inutiles, mais coherence avec CSS)
@@ -702,52 +708,52 @@ function image_masque($im, $masque, $pos = "") {
 	// saturation: utilise la saturation du masque
 	// valeur: utilise la valeur du masque
 
-	$mode = "masque";
+	$mode = 'masque';
 
 	$numargs = func_num_args();
 	$arg_list = func_get_args();
-	$variable = array();
+	$variable = [];
 
 	$texte = $arg_list[0];
 	for ($i = 1; $i < $numargs; $i++) {
-		if (($p = strpos($arg_list[$i], "=")) !== false) {
+		if (($p = strpos($arg_list[$i], '=')) !== false) {
 			$nom_variable = substr($arg_list[$i], 0, $p);
 			$val_variable = substr($arg_list[$i], $p + 1);
 			$variable["$nom_variable"] = $val_variable;
 			$defini["$nom_variable"] = 1;
 		}
 	}
-	if (isset($defini["mode"]) and $defini["mode"]) {
-		$mode = $variable["mode"];
+	if (isset($defini['mode']) and $defini['mode']) {
+		$mode = $variable['mode'];
 	}
 
 	// utiliser _image_valeurs_trans pour accepter comme masque :
 	// - une balise <img src='...' />
 	// - une image avec un timestamp ?01234
-	$mask = _image_valeurs_trans($masque, "source-image_masque", "png", null, true);
+	$mask = _image_valeurs_trans($masque, 'source-image_masque', 'png', null, true);
 	if (!$mask) {
-		return ("");
+		return ('');
 	}
 	$masque = $mask['fichier'];
 
 	$pos = md5(serialize($variable) . $mask['date_src']);
-	$fonction = array('image_masque', func_get_args());
-	$image = _image_valeurs_trans($im, "masque-$masque-$pos", "png", $fonction);
+	$fonction = ['image_masque', func_get_args()];
+	$image = _image_valeurs_trans($im, "masque-$masque-$pos", 'png', $fonction);
 	if (!$image) {
-		return ("");
+		return ('');
 	}
 
-	$x_i = $image["largeur"];
-	$y_i = $image["hauteur"];
+	$x_i = $image['largeur'];
+	$y_i = $image['hauteur'];
 
-	$im = $image["fichier"];
-	$dest = $image["fichier_dest"];
+	$im = $image['fichier'];
+	$dest = $image['fichier_dest'];
 
-	$creer = $image["creer"];
+	$creer = $image['creer'];
 
 	// doit-on positionner l'image ?
 	$placer = false;
-	foreach (array("right", "left", "bottom", "top", "text-align", "vertical-align") as $pl) {
+	foreach (['right', 'left', 'bottom', 'top', 'text-align', 'vertical-align'] as $pl) {
 		if (isset($defini[$pl]) and $defini[$pl]) {
 			$placer = true;
 			break;
@@ -755,18 +761,17 @@ function image_masque($im, $masque, $pos = "") {
 	}
 
 	if ($creer) {
+		$im_m = $mask['fichier'];
+		$x_m = $mask['largeur'];
+		$y_m = $mask['hauteur'];
 
-		$im_m = $mask["fichier"];
-		$x_m = $mask["largeur"];
-		$y_m = $mask["hauteur"];
-
-		$im2 = $mask["fonction_imagecreatefrom"]($masque);
-		if ($mask["format_source"] == "gif" and function_exists('ImageCopyResampled')) {
+		$im2 = $mask['fonction_imagecreatefrom']($masque);
+		if ($mask['format_source'] == 'gif' and function_exists('ImageCopyResampled')) {
 			$im2_ = imagecreatetruecolor($x_m, $y_m);
-			// Si un GIF est transparent, 
-			// fabriquer un PNG transparent  
-			// Conserver la transparence 
-			if (function_exists("imageAntiAlias")) {
+			// Si un GIF est transparent,
+			// fabriquer un PNG transparent
+			// Conserver la transparence
+			if (function_exists('imageAntiAlias')) {
 				imageAntiAlias($im2_, true);
 			}
 			@imagealphablending($im2_, false);
@@ -785,49 +790,49 @@ function image_masque($im, $masque, $pos = "") {
 			$dx = 0;
 			$dy = 0;
 
-			if (isset($defini["right"]) and $defini["right"]) {
-				$right = $variable["right"];
+			if (isset($defini['right']) and $defini['right']) {
+				$right = $variable['right'];
 				$dx = ($x_i - $x_m) - $right;
 			}
-			if (isset($defini["bottom"]) and $defini["bottom"]) {
-				$bottom = $variable["bottom"];
+			if (isset($defini['bottom']) and $defini['bottom']) {
+				$bottom = $variable['bottom'];
 				$dy = ($y_i - $y_m) - $bottom;
 			}
-			if (isset($defini["top"]) and $defini["top"]) {
-				$top = $variable["top"];
+			if (isset($defini['top']) and $defini['top']) {
+				$top = $variable['top'];
 				$dy = $top;
 			}
-			if (isset($defini["left"]) and $defini["left"]) {
-				$left = $variable["left"];
+			if (isset($defini['left']) and $defini['left']) {
+				$left = $variable['left'];
 				$dx = $left;
 			}
-			if (isset($defini["text-align"]) and $defini["text-align"]) {
-				$align = $variable["text-align"];
-				if ($align == "right") {
+			if (isset($defini['text-align']) and $defini['text-align']) {
+				$align = $variable['text-align'];
+				if ($align == 'right') {
 					$right = 0;
 					$dx = ($x_i - $x_m);
 				} else {
-					if ($align == "left") {
+					if ($align == 'left') {
 						$left = 0;
 						$dx = 0;
 					} else {
-						if ($align = "center") {
+						if ($align = 'center') {
 							$dx = round(($x_i - $x_m) / 2);
 						}
 					}
 				}
 			}
-			if (isset($defini["vertical-align"]) and $defini["vertical-align"]) {
-				$valign = $variable["vertical-align"];
-				if ($valign == "bottom") {
+			if (isset($defini['vertical-align']) and $defini['vertical-align']) {
+				$valign = $variable['vertical-align'];
+				if ($valign == 'bottom') {
 					$bottom = 0;
 					$dy = ($y_i - $y_m);
 				} else {
-					if ($valign == "top") {
+					if ($valign == 'top') {
 						$top = 0;
 						$dy = 0;
 					} else {
-						if ($valign = "middle") {
+						if ($valign = 'middle') {
 							$dy = round(($y_i - $y_m) / 2);
 						}
 					}
@@ -838,7 +843,7 @@ function image_masque($im, $masque, $pos = "") {
 			$im3 = imagecreatetruecolor($x_i, $y_i);
 			@imagealphablending($im3, false);
 			@imagesavealpha($im3, true);
-			if ($mode == "masque") {
+			if ($mode == 'masque') {
 				$color_t = ImageColorAllocateAlpha($im3, 128, 128, 128, 0);
 			} else {
 				$color_t = ImageColorAllocateAlpha($im3, 128, 128, 128, 127);
@@ -882,21 +887,21 @@ function image_masque($im, $masque, $pos = "") {
 		}
 
 
-		$nouveau = _image_valeurs_trans(image_reduire($im, $x_d, $y_d), "");
+		$nouveau = _image_valeurs_trans(image_reduire($im, $x_d, $y_d), '');
 		if (!is_array($nouveau)) {
-			return ("");
+			return ('');
 		}
-		$im_n = $nouveau["fichier"];
+		$im_n = $nouveau['fichier'];
 
 
-		$im = $nouveau["fonction_imagecreatefrom"]($im_n);
+		$im = $nouveau['fonction_imagecreatefrom']($im_n);
 		imagepalettetotruecolor($im);
-		if ($nouveau["format_source"] == "gif" and function_exists('ImageCopyResampled')) {
+		if ($nouveau['format_source'] == 'gif' and function_exists('ImageCopyResampled')) {
 			$im_ = imagecreatetruecolor($x_dest, $y_dest);
-			// Si un GIF est transparent, 
-			// fabriquer un PNG transparent  
-			// Conserver la transparence 
-			if (function_exists("imageAntiAlias")) {
+			// Si un GIF est transparent,
+			// fabriquer un PNG transparent
+			// Conserver la transparence
+			if (function_exists('imageAntiAlias')) {
 				imageAntiAlias($im_, true);
 			}
 			@imagealphablending($im_, false);
@@ -927,7 +932,7 @@ function image_masque($im, $masque, $pos = "") {
 				$g2 = ($rgb2 >> 8) & 0xFF;
 				$b2 = $rgb2 & 0xFF;
 
-				if ($mode == "normal") {
+				if ($mode == 'normal') {
 					$v = (127 - $a) / 127;
 					if ($v == 1) {
 						$r_ = $r;
@@ -958,25 +963,24 @@ function image_masque($im, $masque, $pos = "") {
 						}
 					}
 					$a_ = min($a, $a2);
-
-				} elseif (in_array($mode, array("produit", "difference", "superposer", "lumiere_dure", "ecran"))) {
-					if ($mode == "produit") {
+				} elseif (in_array($mode, ['produit', 'difference', 'superposer', 'lumiere_dure', 'ecran'])) {
+					if ($mode == 'produit') {
 						$r = ($r / 255) * $r2;
 						$g = ($g / 255) * $g2;
 						$b = ($b / 255) * $b2;
-					} elseif ($mode == "difference") {
+					} elseif ($mode == 'difference') {
 						$r = abs($r - $r2);
 						$g = abs($g - $g2);
 						$b = abs($b - $b2);
-					} elseif ($mode == "superposer") {
+					} elseif ($mode == 'superposer') {
 						$r = ($r2 < 128) ? 2 * $r * $r2 / 255 : 255 - (2 * (255 - $r) * (255 - $r2) / 255);
 						$g = ($g2 < 128) ? 2 * $g * $g2 / 255 : 255 - (2 * (255 - $g) * (255 - $g2) / 255);
 						$b = ($b2 < 128) ? 2 * $b * $b2 / 255 : 255 - (2 * (255 - $b) * (255 - $b2) / 255);
-					} elseif ($mode == "lumiere_dure") {
+					} elseif ($mode == 'lumiere_dure') {
 						$r = ($r < 128) ? 2 * $r * $r2 / 255 : 255 - (2 * (255 - $r2) * (255 - $r) / 255);
 						$g = ($g < 128) ? 2 * $g * $g2 / 255 : 255 - (2 * (255 - $g2) * (255 - $g) / 255);
 						$b = ($b < 128) ? 2 * $b * $b2 / 255 : 255 - (2 * (255 - $b2) * (255 - $b) / 255);
-					} elseif ($mode == "ecran") {
+					} elseif ($mode == 'ecran') {
 						$r = 255 - (((255 - $r) * (255 - $r2)) / 255);
 						$g = 255 - (((255 - $g) * (255 - $g2)) / 255);
 						$b = 255 - (((255 - $b) * (255 - $b2)) / 255);
@@ -1004,8 +1008,7 @@ function image_masque($im, $masque, $pos = "") {
 						}
 					}
 					$a_ = $a2;
-
-				} elseif ($mode == "eclaircir" or $mode == "obscurcir") {
+				} elseif ($mode == 'eclaircir' or $mode == 'obscurcir') {
 					$v = (127 - $a) / 127;
 					if ($v == 1) {
 						$r_ = $r;
@@ -1023,7 +1026,7 @@ function image_masque($im, $masque, $pos = "") {
 							$b_ = $b + (($b2 - $b) * $v2 * (1 - $v));
 						}
 					}
-					if ($mode == "eclaircir") {
+					if ($mode == 'eclaircir') {
 						$r_ = max($r_, $r2);
 						$g_ = max($g_, $g2);
 						$b_ = max($b_, $b2);
@@ -1033,31 +1036,30 @@ function image_masque($im, $masque, $pos = "") {
 						$b_ = min($b_, $b2);
 					}
 					$a_ = min($a, $a2);
-
-				} elseif (in_array($mode, array("teinte", "saturation", "valeur"))) {
-					include_spip("filtres/images_lib");
+				} elseif (in_array($mode, ['teinte', 'saturation', 'valeur'])) {
+					include_spip('filtres/images_lib');
 					$hsv = _couleur_rgb2hsv($r, $g, $b); // image au dessus
-					$h = $hsv["h"];
-					$s = $hsv["s"];
-					$v = $hsv["v"];
+					$h = $hsv['h'];
+					$s = $hsv['s'];
+					$v = $hsv['v'];
 					$hsv2 = _couleur_rgb2hsv($r2, $g2, $b2); // image en dessous
-					$h2 = $hsv2["h"];
-					$s2 = $hsv2["s"];
-					$v2 = $hsv2["v"];
+					$h2 = $hsv2['h'];
+					$s2 = $hsv2['s'];
+					$v2 = $hsv2['v'];
 					switch ($mode) {
-						case "teinte";
+						case 'teinte';
 							$rgb3 = _couleur_hsv2rgb($h, $s2, $v2);
 							break;
-						case "saturation";
+						case 'saturation';
 							$rgb3 = _couleur_hsv2rgb($h2, $s, $v2);
 							break;
-						case "valeur";
+						case 'valeur';
 							$rgb3 = _couleur_hsv2rgb($h2, $s2, $v);
 							break;
 					}
-					$r = $rgb3["r"];
-					$g = $rgb3["g"];
-					$b = $rgb3["b"];
+					$r = $rgb3['r'];
+					$g = $rgb3['g'];
+					$b = $rgb3['b'];
 
 					// melange en fonction de la transparence du masque
 					$v = (127 - $a) / 127;
@@ -1078,7 +1080,6 @@ function image_masque($im, $masque, $pos = "") {
 						}
 					}
 					$a_ = $a2;
-
 				} else {
 					$r_ = $r2 + 1 * ($r - 127);
 					$r_ = max(0, min($r_, 255));
@@ -1098,12 +1099,11 @@ function image_masque($im, $masque, $pos = "") {
 		imagedestroy($im_);
 		imagedestroy($im);
 		imagedestroy($im2);
-
 	}
 	$x_dest = largeur($dest);
 	$y_dest = hauteur($dest);
 
-	return _image_ecrire_tag($image, array('src' => $dest, 'width' => $x_dest, 'height' => $y_dest));
+	return _image_ecrire_tag($image, ['src' => $dest, 'width' => $x_dest, 'height' => $y_dest]);
 }
 
 // Passage de l'image en noir et blanc
@@ -1112,26 +1112,26 @@ function image_masque($im, $masque, $pos = "") {
 // on peut ici regler cette ponderation en "pour mille"
 // https://code.spip.net/@image_nb
 function image_nb($im, $val_r = 299, $val_g = 587, $val_b = 114) {
-	$fonction = array('image_nb', func_get_args());
+	$fonction = ['image_nb', func_get_args()];
 	$image = _image_valeurs_trans($im, "nb-$val_r-$val_g-$val_b", false, $fonction, false, _SVG_SUPPORTED);
 	if (!$image) {
-		return ("");
+		return ('');
 	}
 
-	$x_i = $image["largeur"];
-	$y_i = $image["hauteur"];
+	$x_i = $image['largeur'];
+	$y_i = $image['hauteur'];
 
-	$im = $image["fichier"];
-	$dest = $image["fichier_dest"];
+	$im = $image['fichier'];
+	$dest = $image['fichier_dest'];
 
-	$creer = $image["creer"];
+	$creer = $image['creer'];
 
 	// Methode precise
 	// resultat plus beau, mais tres lourd
 	// Et: indispensable pour preserver transparence!
 
 	if ($creer) {
-		if ($image['format_source']==='svg'){
+		if ($image['format_source'] === 'svg') {
 			#$svg = svg_transformer($im, ['style' => "filter:grayscale(100%);"]); // ne semble pas fonctionner dans Safari+Chrome
 			$svg = svg_filter_grayscale($im, 1.0);
 			_image_gd_output($svg, $image);
@@ -1139,7 +1139,7 @@ function image_nb($im, $val_r = 299, $val_g = 587, $val_b = 114) {
 		else {
 			// Creation de l'image en deux temps
 			// de facon a conserver les GIF transparents
-			$im = $image["fonction_imagecreatefrom"]($im);
+			$im = $image['fonction_imagecreatefrom']($im);
 			imagepalettetotruecolor($im);
 			$im_ = imagecreatetruecolor($x_i, $y_i);
 			@imagealphablending($im_, false);
@@ -1175,7 +1175,7 @@ function image_nb($im, $val_r = 299, $val_g = 587, $val_b = 114) {
 		}
 	}
 
-	return _image_ecrire_tag($image, array('src' => $dest));
+	return _image_ecrire_tag($image, ['src' => $dest]);
 }
 
 // https://code.spip.net/@image_flou
@@ -1183,52 +1183,51 @@ function image_flou($im, $niveau = 3) {
 	// Il s'agit d'une modification du script blur qu'on trouve un peu partout:
 	// + la transparence est geree correctement
 	// + les dimensions de l'image sont augmentees pour flouter les bords
-	$coeffs = array(
-		array(1),
-		array(1, 1),
-		array(1, 2, 1),
-		array(1, 3, 3, 1),
-		array(1, 4, 6, 4, 1),
-		array(1, 5, 10, 10, 5, 1),
-		array(1, 6, 15, 20, 15, 6, 1),
-		array(1, 7, 21, 35, 35, 21, 7, 1),
-		array(1, 8, 28, 56, 70, 56, 28, 8, 1),
-		array(1, 9, 36, 84, 126, 126, 84, 36, 9, 1),
-		array(1, 10, 45, 120, 210, 252, 210, 120, 45, 10, 1),
-		array(1, 11, 55, 165, 330, 462, 462, 330, 165, 55, 11, 1)
-	);
+	$coeffs = [
+		[1],
+		[1, 1],
+		[1, 2, 1],
+		[1, 3, 3, 1],
+		[1, 4, 6, 4, 1],
+		[1, 5, 10, 10, 5, 1],
+		[1, 6, 15, 20, 15, 6, 1],
+		[1, 7, 21, 35, 35, 21, 7, 1],
+		[1, 8, 28, 56, 70, 56, 28, 8, 1],
+		[1, 9, 36, 84, 126, 126, 84, 36, 9, 1],
+		[1, 10, 45, 120, 210, 252, 210, 120, 45, 10, 1],
+		[1, 11, 55, 165, 330, 462, 462, 330, 165, 55, 11, 1]
+	];
 
-	$fonction = array('image_flou', func_get_args());
+	$fonction = ['image_flou', func_get_args()];
 	$image = _image_valeurs_trans($im, "flou-$niveau", false, $fonction, '', _SVG_SUPPORTED);
 	if (!$image) {
-		return ("");
+		return ('');
 	}
 
-	$x_i = $image["largeur"];
-	$y_i = $image["hauteur"];
+	$x_i = $image['largeur'];
+	$y_i = $image['hauteur'];
 	$sum = pow(2, $niveau);
 
-	$im = $image["fichier"];
-	$dest = $image["fichier_dest"];
+	$im = $image['fichier'];
+	$dest = $image['fichier_dest'];
 
-	$creer = $image["creer"];
+	$creer = $image['creer'];
 
 	// Methode precise
 	// resultat plus beau, mais tres lourd
 	// Et: indispensable pour preserver transparence!
 
 	if ($creer) {
-		if ($image['format_source']==='svg'){
+		if ($image['format_source'] === 'svg') {
 			$svg = svg_recadrer($im, $x_i + $niveau, $y_i + $niveau, -round($niveau / 2), -round($niveau / 2));
 			#$svg = svg_transformer($svg, ['style' => "filter:blur({$niveau}px);"]); // ne semble pas supporte par safari+chrome
 			$svg = svg_filter_blur($svg, $niveau);
 			_image_gd_output($svg, $image);
 		}
 		else {
-
 			// Creation de l'image en deux temps
 			// de facon a conserver les GIF transparents
-			$im = $image["fonction_imagecreatefrom"]($im);
+			$im = $image['fonction_imagecreatefrom']($im);
 			imagepalettetotruecolor($im);
 			$temp1 = imagecreatetruecolor($x_i + $niveau, $y_i);
 			$temp2 = imagecreatetruecolor($x_i + $niveau, $y_i + $niveau);
@@ -1306,7 +1305,6 @@ function image_flou($im, $niveau = 3) {
 						$sumb += $b * $coeffs[$niveau][$k] * $ac;
 						$sum += $coeffs[$niveau][$k] * $ac;
 						$sum_ += $coeffs[$niveau][$k];
-
 					}
 					if ($sum > 0) {
 						$color = ImageColorAllocateAlpha($temp2, $sumr / $sum, $sumg / $sum, $sumb / $sum, $suma / $sum_);
@@ -1323,7 +1321,7 @@ function image_flou($im, $niveau = 3) {
 		}
 	}
 
-	return _image_ecrire_tag($image, array('src' => $dest, 'width' => ($x_i + $niveau), 'height' => ($y_i + $niveau)));
+	return _image_ecrire_tag($image, ['src' => $dest, 'width' => ($x_i + $niveau), 'height' => ($y_i + $niveau)]);
 }
 
 
@@ -1338,7 +1336,7 @@ function image_flou($im, $niveau = 3) {
  * @return array
  *  [int, int]
  */
-function dimensions_rotation_image($angle, $width, $height, $center_x=null, $center_y=null) {
+function dimensions_rotation_image($angle, $width, $height, $center_x = null, $center_y = null) {
 
 	if (round($angle / 90) * 90 == $angle) {
 		$droit = true;
@@ -1358,8 +1356,8 @@ function dimensions_rotation_image($angle, $width, $height, $center_x=null, $cen
 	if (is_null($center_x)) {
 		$center_x = floor(($width - 1) / 2);
 	}
-	if (is_null($center_y)){
-		$center_y = floor(($height-1)/2);
+	if (is_null($center_y)) {
+		$center_y = floor(($height - 1) / 2);
 	}
 
 	$cosangle = cos($angle);
@@ -1368,12 +1366,12 @@ function dimensions_rotation_image($angle, $width, $height, $center_x=null, $cen
 	// calculer dimensions en simplifiant angles droits, ce qui evite "floutage"
 	// des rotations a angle droit
 	if (!$droit) {
-		$corners = array(array(0, 0), array($width, 0), array($width, $height), array(0, $height));
+		$corners = [[0, 0], [$width, 0], [$width, $height], [0, $height]];
 
 		foreach ($corners as $key => $value) {
 			$value[0] -= $center_x;        //Translate coords to center for rotation
 			$value[1] -= $center_y;
-			$temp = array();
+			$temp = [];
 			$temp[0] = $value[0] * $cosangle + $value[1] * $sinangle;
 			$temp[1] = $value[1] * $cosangle - $value[0] * $sinangle;
 			$corners[$key] = $temp;
@@ -1458,7 +1456,8 @@ function image_RotateBicubic($src_img, $angle, $bicubic = false) {
 			$old_x = ceil($old_x);
 			$old_y = ceil($old_y);
 
-			if ($old_x >= 0 && $old_x < $src_x
+			if (
+				$old_x >= 0 && $old_x < $src_x
 				&& $old_y >= 0 && $old_y < $src_y
 			) {
 				if ($bicubic == true) {
@@ -1503,7 +1502,7 @@ function image_RotateBicubic($src_img, $angle, $bicubic = false) {
 					$ac3 = ((127 - $a3) / 127);
 					$ac4 = ((127 - $a4) / 127);
 
-					// limiter impact des couleurs transparentes, 
+					// limiter impact des couleurs transparentes,
 					// mais attention tout transp: division par 0
 					if ($ac1 * $d1 + $ac2 * $d2 + $ac3 + $d3 + $ac4 + $d4 > 0) {
 						if ($ac1 > 0) {
@@ -1545,27 +1544,27 @@ function image_RotateBicubic($src_img, $angle, $bicubic = false) {
 // la fonction "crop" n'est pas implementee...
 // https://code.spip.net/@image_rotation
 function image_rotation($im, $angle, $crop = false) {
-	$fonction = array('image_rotation', func_get_args());
-	$image = _image_valeurs_trans($im, "rot-$angle-$crop", "png", $fonction, false, _SVG_SUPPORTED);
+	$fonction = ['image_rotation', func_get_args()];
+	$image = _image_valeurs_trans($im, "rot-$angle-$crop", 'png', $fonction, false, _SVG_SUPPORTED);
 	if (!$image) {
-		return ("");
+		return ('');
 	}
 	if ($image['format_source'] === 'svg') {
 		// ne pas forcer le format
 		$image = _image_valeurs_trans($im, "rot-$angle-$crop", false, $fonction, false, _SVG_SUPPORTED);
 	}
 
-	$im = $image["fichier"];
-	$dest = $image["fichier_dest"];
+	$im = $image['fichier'];
+	$dest = $image['fichier_dest'];
 
-	$creer = $image["creer"];
+	$creer = $image['creer'];
 
 	if ($creer) {
-		if ($image['format_source'] === 'svg'){
-			$center_x = floor(($image['largeur']- 1) / 2);
-			$center_y = floor(($image['hauteur']- 1) / 2);
+		if ($image['format_source'] === 'svg') {
+			$center_x = floor(($image['largeur'] - 1) / 2);
+			$center_y = floor(($image['hauteur'] - 1) / 2);
 			list($rotate_width, $rotate_height, $droit) = dimensions_rotation_image($angle, $image['largeur'], $image['hauteur'], $center_x, $center_y);
-			$svg = svg_recadrer($im, $rotate_width, $rotate_height, -round(($rotate_width-$image['largeur'])/2), -round(($rotate_height-$image['hauteur'])/2));
+			$svg = svg_recadrer($im, $rotate_width, $rotate_height, -round(($rotate_width - $image['largeur']) / 2), -round(($rotate_height - $image['hauteur']) / 2));
 			$svg = svg_rotate($svg, $angle, 0.5, 0.5);
 			_image_gd_output($svg, $image);
 		}
@@ -1579,7 +1578,7 @@ function image_rotation($im, $angle, $crop = false) {
 				$imagick->writeImage($dest);
 				$effectuer_gd = false;
 			} else {
-				if ($GLOBALS['meta']['image_process'] == "convert") {
+				if ($GLOBALS['meta']['image_process'] == 'convert') {
 					if (_CONVERT_COMMAND != '') {
 						@define('_CONVERT_COMMAND', 'convert');
 						@define('_ROTATE_COMMAND', _CONVERT_COMMAND . ' -background none -rotate %t %src %dest');
@@ -1588,18 +1587,18 @@ function image_rotation($im, $angle, $crop = false) {
 					}
 					if (_ROTATE_COMMAND !== '') {
 						$commande = str_replace(
-							array('%t', '%src', '%dest'),
-							array(
+							['%t', '%src', '%dest'],
+							[
 								$angle,
 								escapeshellcmd($im),
 								escapeshellcmd($dest)
-							),
-							_ROTATE_COMMAND);
+							],
+							_ROTATE_COMMAND
+						);
 						spip_log($commande);
 						exec($commande);
-						if (file_exists($dest)) // precaution
-						{
-							$effectuer_gd = false;
+						if (file_exists($dest)) { // precaution
+						$effectuer_gd = false;
 						}
 					}
 				}
@@ -1618,7 +1617,7 @@ function image_rotation($im, $angle, $crop = false) {
 			if ($effectuer_gd) {
 				// Creation de l'image en deux temps
 				// de facon a conserver les GIF transparents
-				$im = $image["fonction_imagecreatefrom"]($im);
+				$im = $image['fonction_imagecreatefrom']($im);
 				imagepalettetotruecolor($im);
 				$im = image_RotateBicubic($im, $angle, true);
 				_image_gd_output($im, $image);
@@ -1628,7 +1627,7 @@ function image_rotation($im, $angle, $crop = false) {
 	}
 	list($src_y, $src_x) = taille_image($dest);
 
-	return _image_ecrire_tag($image, array('src' => $dest, 'width' => $src_x, 'height' => $src_y));
+	return _image_ecrire_tag($image, ['src' => $dest, 'width' => $src_x, 'height' => $src_y]);
 }
 
 // Permet d'appliquer un filtre php_imagick a une image
@@ -1639,22 +1638,22 @@ function image_imagick() {
 	$tous = func_get_args();
 	$img = $tous[0];
 	$fonc = $tous[1];
-	$tous[0] = "";
-	$tous_var = join($tous, "-");
+	$tous[0] = '';
+	$tous_var = join($tous, '-');
 
-	$fonction = array('image_imagick', func_get_args());
-	$image = _image_valeurs_trans($img, "$tous_var", "png", $fonction);
+	$fonction = ['image_imagick', func_get_args()];
+	$image = _image_valeurs_trans($img, "$tous_var", 'png', $fonction);
 	if (!$image) {
-		return ("");
+		return ('');
 	}
 
-	$im = $image["fichier"];
-	$dest = $image["fichier_dest"];
+	$im = $image['fichier'];
+	$dest = $image['fichier_dest'];
 
-	$creer = $image["creer"];
+	$creer = $image['creer'];
 
 	if ($creer) {
-		if (method_exists('Imagick',$fonc)) {
+		if (method_exists('Imagick', $fonc)) {
 			$imagick = new Imagick();
 			$imagick->readImage($im);
 			$args = $tous;
@@ -1664,7 +1663,6 @@ function image_imagick() {
 			_image_gd_output($imagick, $image, _IMG_GD_QUALITE, '_image_imagick_write');
 		}
 		elseif (function_exists($fonc)) {
-
 			$handle = imagick_readimage($im);
 			$arr[0] = $handle;
 			for ($i = 2; $i < count($tous); $i++) {
@@ -1676,8 +1674,7 @@ function image_imagick() {
 	}
 	list($src_y, $src_x) = taille_image($dest);
 
-	return _image_ecrire_tag($image, array('src' => $dest, 'width' => $src_x, 'height' => $src_y));
-
+	return _image_ecrire_tag($image, ['src' => $dest, 'width' => $src_x, 'height' => $src_y]);
 }
 
 
@@ -1696,7 +1693,7 @@ function image_imagick() {
  *     - true si une image est bien retournée.
  */
 function _image_imagick_write($imagick, $fichier, $qualite = _IMG_GD_QUALITE) {
-	$tmp = $fichier . ".tmp";
+	$tmp = $fichier . '.tmp';
 	if (is_a($imagick, 'Imagick')) {
 		$ret = $imagick->writeImage($tmp);
 	}
@@ -1724,35 +1721,35 @@ function _image_imagick_write($imagick, $fichier, $qualite = _IMG_GD_QUALITE) {
 // https://code.spip.net/@image_gamma
 function image_gamma($im, $gamma = 0) {
 	include_spip('filtres/images_lib');
-	$fonction = array('image_gamma', func_get_args());
+	$fonction = ['image_gamma', func_get_args()];
 	$image = _image_valeurs_trans($im, "gamma-$gamma", false, $fonction, false, _SVG_SUPPORTED);
 	if (!$image) {
-		return ("");
+		return ('');
 	}
 
-	$x_i = $image["largeur"];
-	$y_i = $image["hauteur"];
+	$x_i = $image['largeur'];
+	$y_i = $image['hauteur'];
 
-	$im = $image["fichier"];
-	$dest = $image["fichier_dest"];
+	$im = $image['fichier'];
+	$dest = $image['fichier_dest'];
 
-	$creer = $image["creer"];
+	$creer = $image['creer'];
 
 	if ($creer) {
-		if ($image['format_source']==='svg'){
-			$pc = round($gamma / 255,2);
+		if ($image['format_source'] === 'svg') {
+			$pc = round($gamma / 255, 2);
 			if ($pc > 0) {
-				$svg = svg_ajouter_voile($im, "#ffffff", $pc);
+				$svg = svg_ajouter_voile($im, '#ffffff', $pc);
 			}
 			else {
-				$svg = svg_ajouter_voile($im, "#000000", -$pc);
+				$svg = svg_ajouter_voile($im, '#000000', -$pc);
 			}
 			_image_gd_output($svg, $image);
 		}
 		else {
 			// Creation de l'image en deux temps
 			// de facon a conserver les GIF transparents
-			$im = $image["fonction_imagecreatefrom"]($im);
+			$im = $image['fonction_imagecreatefrom']($im);
 			imagepalettetotruecolor($im);
 			$im_ = imagecreatetruecolor($x_i, $y_i);
 			@imagealphablending($im_, false);
@@ -1781,42 +1778,42 @@ function image_gamma($im, $gamma = 0) {
 		}
 	}
 
-	return _image_ecrire_tag($image, array('src' => $dest));
+	return _image_ecrire_tag($image, ['src' => $dest]);
 }
 
 // Passe l'image en "sepia"
-// On peut fixer les valeurs RGB 
+// On peut fixer les valeurs RGB
 // de la couleur "complementaire" pour forcer une dominante
 //function image_sepia($im, $dr = 137, $dv = 111, $db = 94)
 // https://code.spip.net/@image_sepia
-function image_sepia($im, $rgb = "896f5e") {
+function image_sepia($im, $rgb = '896f5e') {
 	include_spip('filtres/images_lib');
 
-	if (!function_exists("imagecreatetruecolor")) {
+	if (!function_exists('imagecreatetruecolor')) {
 		return $im;
 	}
 
 	$couleurs = _couleur_hex_to_dec($rgb);
-	$dr = $couleurs["red"];
-	$dv = $couleurs["green"];
-	$db = $couleurs["blue"];
+	$dr = $couleurs['red'];
+	$dv = $couleurs['green'];
+	$db = $couleurs['blue'];
 
-	$fonction = array('image_sepia', func_get_args());
+	$fonction = ['image_sepia', func_get_args()];
 	$image = _image_valeurs_trans($im, "sepia-$dr-$dv-$db", false, $fonction, false, _SVG_SUPPORTED);
 	if (!$image) {
-		return ("");
+		return ('');
 	}
 
-	$x_i = $image["largeur"];
-	$y_i = $image["hauteur"];
+	$x_i = $image['largeur'];
+	$y_i = $image['hauteur'];
 
-	$im = $image["fichier"];
-	$dest = $image["fichier_dest"];
+	$im = $image['fichier'];
+	$dest = $image['fichier_dest'];
 
-	$creer = $image["creer"];
+	$creer = $image['creer'];
 
 	if ($creer) {
-		if ($image['format_source']==='svg'){
+		if ($image['format_source'] === 'svg') {
 			#$svg = svg_transformer($im, ['style' => "filter:sepia(1);"]); // ne fonctionne pas dans Chrome+Safari
 			$svg = svg_filter_sepia($im, 1);
 			_image_gd_output($svg, $image);
@@ -1824,7 +1821,7 @@ function image_sepia($im, $rgb = "896f5e") {
 		else {
 			// Creation de l'image en deux temps
 			// de facon a conserver les GIF transparents
-			$im = $image["fonction_imagecreatefrom"]($im);
+			$im = $image['fonction_imagecreatefrom']($im);
 			imagepalettetotruecolor($im);
 			$im_ = imagecreatetruecolor($x_i, $y_i);
 			@imagealphablending($im_, false);
@@ -1860,7 +1857,7 @@ function image_sepia($im, $rgb = "896f5e") {
 		}
 	}
 
-	return _image_ecrire_tag($image, array('src' => $dest));
+	return _image_ecrire_tag($image, ['src' => $dest]);
 }
 
 
@@ -1874,20 +1871,20 @@ function image_sepia($im, $rgb = "896f5e") {
  * @return string Code HTML de l'image
  **/
 function image_renforcement($im, $k = 0.5) {
-	$fonction = array('image_flou', func_get_args());
+	$fonction = ['image_flou', func_get_args()];
 	$image = _image_valeurs_trans($im, "renforcement-$k", false, $fonction);
 	if (!$image) {
-		return ("");
+		return ('');
 	}
 
-	$x_i = $image["largeur"];
-	$y_i = $image["hauteur"];
-	$im = $image["fichier"];
-	$dest = $image["fichier_dest"];
-	$creer = $image["creer"];
+	$x_i = $image['largeur'];
+	$y_i = $image['hauteur'];
+	$im = $image['fichier'];
+	$dest = $image['fichier_dest'];
+	$creer = $image['creer'];
 
 	if ($creer) {
-		$im = $image["fonction_imagecreatefrom"]($im);
+		$im = $image['fonction_imagecreatefrom']($im);
 		imagepalettetotruecolor($im);
 		$im_ = imagecreatetruecolor($x_i, $y_i);
 		@imagealphablending($im_, false);
@@ -1897,7 +1894,6 @@ function image_renforcement($im, $k = 0.5) {
 
 		for ($x = 0; $x < $x_i; $x++) {
 			for ($y = 0; $y < $y_i; $y++) {
-
 				$rgb[1][0] = @imagecolorat($im, $x, $y - 1);
 				$rgb[0][1] = @imagecolorat($im, $x - 1, $y);
 				$rgb[1][1] = @imagecolorat($im, $x, $y);
@@ -1948,7 +1944,7 @@ function image_renforcement($im, $k = 0.5) {
 		_image_gd_output($im_, $image);
 	}
 
-	return _image_ecrire_tag($image, array('src' => $dest));
+	return _image_ecrire_tag($image, ['src' => $dest]);
 }
 
 
@@ -1970,23 +1966,23 @@ function image_renforcement($im, $k = 0.5) {
  * @return mixed|null|string
  */
 function image_fond_transparent($im, $background_color, $tolerance = 12, $alpha = 127, $coeff_lissage = 7) {
-	$fonction = array('image_fond_transparent', func_get_args());
-	$image = _image_valeurs_trans($im, "fond_transparent-$background_color-$tolerance-$coeff_lissage-$alpha", "png", $fonction, false, _SVG_SUPPORTED);
+	$fonction = ['image_fond_transparent', func_get_args()];
+	$image = _image_valeurs_trans($im, "fond_transparent-$background_color-$tolerance-$coeff_lissage-$alpha", 'png', $fonction, false, _SVG_SUPPORTED);
 	if (!$image) {
-		return ("");
+		return ('');
 	}
-	if ($image['format_source']==='svg'){
+	if ($image['format_source'] === 'svg') {
 		// Ne rien faire si SVG
 		$image = _image_valeurs_trans($im, "fond_transparent-$background_color-$tolerance-$coeff_lissage-$alpha", false, $fonction);
 	}
 
-	$x_i = $image["largeur"];
-	$y_i = $image["hauteur"];
+	$x_i = $image['largeur'];
+	$y_i = $image['hauteur'];
 
-	$im = $image["fichier"];
-	$dest = $image["fichier_dest"];
+	$im = $image['fichier'];
+	$dest = $image['fichier_dest'];
 
-	$creer = $image["creer"];
+	$creer = $image['creer'];
 
 	if ($creer) {
 		$bg = _couleur_hex_to_dec($background_color);
@@ -1996,7 +1992,7 @@ function image_fond_transparent($im, $background_color, $tolerance = 12, $alpha 
 
 		// Creation de l'image en deux temps
 		// de facon a conserver les GIF transparents
-		$im = $image["fonction_imagecreatefrom"]($im);
+		$im = $image['fonction_imagecreatefrom']($im);
 		imagepalettetotruecolor($im);
 		$im2 = imagecreatetruecolor($x_i, $y_i);
 		@imagealphablending($im2, false);
@@ -2033,5 +2029,5 @@ function image_fond_transparent($im, $background_color, $tolerance = 12, $alpha 
 		imagedestroy($im2);
 	}
 
-	return _image_ecrire_tag($image, array('src' => $dest));
+	return _image_ecrire_tag($image, ['src' => $dest]);
 }

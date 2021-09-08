@@ -1,4 +1,5 @@
 <?php
+
 /***************************************************************************\
  *  SPIP, Système de publication pour l'internet                           *
  *                                                                         *
@@ -42,11 +43,10 @@ function _couleur_rgb2hsv($R, $G, $B) {
 	$V = $var_Max;
 	$L = ($var_Max + $var_Min) / 2;
 
-	if ($del_Max == 0)                     //This is a gray, no chroma...
-	{
-		$H = 0;                            //HSL results = 0 Ã· 1
+	if ($del_Max == 0) {                     //This is a gray, no chroma...
+	$H = 0;                            //HSL results = 0 Ã· 1
 		$S = 0;
-	} else                                    //Chromatic data...
+	} else //Chromatic data...
 	{
 		$S = $del_Max / $var_Max;
 
@@ -74,9 +74,9 @@ function _couleur_rgb2hsv($R, $G, $B) {
 		}
 	}
 
-	$ret["h"] = $H;
-	$ret["s"] = $S;
-	$ret["v"] = $V;
+	$ret['h'] = $H;
+	$ret['s'] = $S;
+	$ret['v'] = $V;
 
 	return $ret;
 }
@@ -93,9 +93,8 @@ function _couleur_rgb2hsv($R, $G, $B) {
  */
 function _couleur_hsv2rgb($H, $S, $V) {
 
-	if ($S == 0)                       //HSV values = 0 Ã· 1
-	{
-		$R = $V * 255;
+	if ($S == 0) {                       //HSV values = 0 Ã· 1
+	$R = $V * 255;
 		$G = $V * 255;
 		$B = $V * 255;
 	} else {
@@ -147,9 +146,9 @@ function _couleur_hsv2rgb($H, $S, $V) {
 		$G = $var_g * 255;
 		$B = $var_b * 255;
 	}
-	$ret["r"] = floor($R);
-	$ret["g"] = floor($G);
-	$ret["b"] = floor($B);
+	$ret['r'] = floor($R);
+	$ret['g'] = floor($G);
+	$ret['b'] = floor($B);
 
 	return $ret;
 }
@@ -157,7 +156,7 @@ function _couleur_hsv2rgb($H, $S, $V) {
 
 /**
  * Transformation d'une couleur RGB en HSL
- * 
+ *
  * HSL float entre 0 et 1
  * RGB entiers entre 0 et 255
  *
@@ -174,7 +173,7 @@ function _couleur_rgb2hsl($R, $G, $B) {
 
 /**
  * Transformation d'une couleur HSL en RGB
- * 
+ *
  * HSL float entre 0 et 1
  * RGB entiers entre 0 et 255
  *
@@ -198,34 +197,34 @@ function _couleur_hsl2rgb($H, $S, $L) {
 // https://code.spip.net/@image_couleur_extraire
 
 function _image_couleur_extraire($img, $x = 10, $y = 6) {
-	static $couleur_extraite = array();
+	static $couleur_extraite = [];
 
 	if (isset($couleur_extraite["$img-$x-$y"])) {
 		return $couleur_extraite["$img-$x-$y"];
 	}
 
 	// valeur par defaut si l'image ne peut etre lue
-	$defaut = "F26C4E";
+	$defaut = 'F26C4E';
 
-	$image = _image_valeurs_trans($img, "coul-$x-$y", "txt",null,false,_SVG_SUPPORTED);
+	$image = _image_valeurs_trans($img, "coul-$x-$y", 'txt', null, false, _SVG_SUPPORTED);
 	if (!$image) {
 		return $couleur_extraite["$img-$x-$y"] = $defaut;
 	}
 
 
-	$fichier = $image["fichier"];
-	$dest = $image["fichier_dest"];
+	$fichier = $image['fichier'];
+	$dest = $image['fichier_dest'];
 
 	if (isset($couleur_extraite["$fichier-$x-$y"])) {
 		return $couleur_extraite["$fichier-$x-$y"];
 	}
 
-	$creer = $image["creer"];
+	$creer = $image['creer'];
 
 	if ($creer) {
 		if (@file_exists($fichier)) {
-			if ($image['format_source'] === 'svg'){
-				$couleur="eeddcc";
+			if ($image['format_source'] === 'svg') {
+				$couleur = 'eeddcc';
 				$couleurs = svg_extract_couleurs($fichier);
 				if ($couleurs) {
 					$couleurs = array_map('svg_couleur_to_rgb', $couleurs);
@@ -238,15 +237,15 @@ function _image_couleur_extraire($img, $x = 10, $y = 6) {
 				}
 			}
 			else {
-				$width = $image["largeur"];
-				$height = $image["hauteur"];
+				$width = $image['largeur'];
+				$height = $image['hauteur'];
 
 				$newwidth = 20;
 				$newheight = 20;
 
 				$thumb = imagecreate($newwidth, $newheight);
 
-				$source = $image["fonction_imagecreatefrom"]($fichier);
+				$source = $image['fonction_imagecreatefrom']($fichier);
 
 				imagepalettetotruecolor($source);
 
@@ -255,8 +254,8 @@ function _image_couleur_extraire($img, $x = 10, $y = 6) {
 				if ($x === 'moyenne') {
 					$moyenne = null;
 					$nb_points = 0;
-					for ($x=0;$x<$newwidth;$x++) {
-						for ($y=0;$y<$newheight;$y++) {
+					for ($x = 0; $x < $newwidth; $x++) {
+						for ($y = 0; $y < $newheight; $y++) {
 							// get a color
 							$color_index = imagecolorat($thumb, $x, $y);
 							// make it human readable
@@ -284,7 +283,7 @@ function _image_couleur_extraire($img, $x = 10, $y = 6) {
 							$moyenne['blue'] = round($moyenne['blue'] / $nb_points);
 						}
 
-						$couleur = _couleur_dec_to_hex($moyenne["red"], $moyenne["green"], $moyenne["blue"]);
+						$couleur = _couleur_dec_to_hex($moyenne['red'], $moyenne['green'], $moyenne['blue']);
 					}
 				}
 				else {
@@ -298,7 +297,7 @@ function _image_couleur_extraire($img, $x = 10, $y = 6) {
 						$y++;
 					} while ($color_tran['alpha'] == 127 and $x < $newwidth and $y < $newheight);
 
-					$couleur = _couleur_dec_to_hex($color_tran["red"], $color_tran["green"], $color_tran["blue"]);
+					$couleur = _couleur_dec_to_hex($color_tran['red'], $color_tran['green'], $color_tran['blue']);
 				}
 			}
 		} else {
