@@ -74,6 +74,7 @@ $GLOBALS['spip_matrice']['_image_decale_composante_127'] = 'filtres/images_lib.p
  * @return string
  */
 function image_typo() {
+	include_spip('inc/filtres_images_mini.php');
 	include_spip('filtres/images_typo');
 	$tous = func_get_args();
 	return call_user_func_array('produire_image_typo', $tous);
