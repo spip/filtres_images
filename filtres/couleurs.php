@@ -143,7 +143,7 @@ function couleur_saturation($couleur, $val, $strict = false) {
 		$old_rgb         = _couleur_hex_to_dec($couleur);
 		$hsl             = _couleur_rgb2hsl($old_rgb['red'], $old_rgb['green'], $old_rgb['blue']);
 		$rgb             = _couleur_hsl2rgb($hsl['h'], floatval($val), $hsl['l']);
-		list($r, $g, $b) = array_values($rgb);
+		[$r, $g, $b] = array_values($rgb);
 
 	// Soit on joue sur la saturation et la luminosité
 	} else {

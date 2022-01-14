@@ -40,6 +40,7 @@ function rtl_mb_ord($char) {
 
 // https://code.spip.net/@rtl_reverse
 function rtl_reverse($mot, $rtl_global) {
+	$res = null;
 	$rtl_prec = $rtl_global;
 
 	$ponctuations = ['/', '-', '«', '»', '“', '”', ',', '.', ' ', ':', ';', '(', ')', '،', '؟', '?', '!', ' '];
@@ -54,7 +55,7 @@ function rtl_reverse($mot, $rtl_global) {
 		$code = rtl_mb_ord($lettre);
 		# echo "<li>$lettre - $code";
 
-		if (($code >= 54928 && $code <= 56767) || ($code >= 15707294 && $code <= 15711164)) {
+		if (($code >= 54928 && $code <= 56767) || ($code >= 15_707_294 && $code <= 15_711_164)) {
 			$rtl = true;
 		} else {
 			$rtl = false;
@@ -519,6 +520,8 @@ function printWordWrapped(
 	$align = 'left',
 	$hauteur_ligne = 0
 ) {
+	$line = null;
+	$retour = [];
 	static $memps = [];
 	$fontps = false;
 
@@ -548,7 +551,7 @@ function printWordWrapped(
 	for ($i = 0; $i < spip_strlen($text); $i++) {
 		$lettre = spip_substr($text, $i, 1);
 		$code = rtl_mb_ord($lettre);
-		if (($code >= 54928 && $code <= 56767) || ($code >= 15707294 && $code <= 15711164)) {
+		if (($code >= 54928 && $code <= 56767) || ($code >= 15_707_294 && $code <= 15_711_164)) {
 			$rtl_global = true;
 		}
 	}

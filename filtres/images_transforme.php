@@ -37,6 +37,7 @@ include_spip('inc/filtres_images_mini');
 // 3/ $transparence a "true" permet de conserver la transparence (utile pour conversion GIF)
 // https://code.spip.net/@image_aplatir
 function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, $transparence = false) {
+	$transp_y = null;
 	if ($qualite === null) {
 		if (in_array($format, ['jpg', 'webp'])) {
 			$qualite = _IMG_GD_QUALITE;
@@ -351,7 +352,7 @@ function image_recadre($im, $width, $height = '-', $position = 'center', $backgr
 	// width : "16:9"
 	// height : "+" pour agrandir l'image et "-" pour la croper
 	if (strpos($width, ':') !== false) {
-		list($wr, $hr) = explode(':', $width);
+		[$wr, $hr] = explode(':', $width);
 		$hm = $x_i / $wr * $hr;
 		$ym = $y_i / $hr * $wr;
 		if ($height == '+' ? ($y_i < $hm) : ($y_i > $hm)) {
@@ -577,7 +578,7 @@ function image_recadre_mini($im) {
 		imagedestroy($im_);
 		imagedestroy($im);
 	} else {
-		list($height, $width) = taille_image($image['fichier_dest']);
+		[$height, $width] = taille_image($image['fichier_dest']);
 	}
 
 	return _image_ecrire_tag($image, ['src' => $dest, 'width' => $width, 'height' => $height]);
@@ -676,6 +677,8 @@ function image_flip_horizontal($im) {
 
 // https://code.spip.net/@image_masque
 function image_masque($im, $masque, $pos = '') {
+	$defini = [];
+	$rgb3 = [];
 	// Passer, en plus de l'image d'origine,
 	// une image de "masque": un fichier PNG24 transparent.
 	// Le decoupage se fera selon la transparence du "masque",
@@ -1206,7 +1209,7 @@ function image_flou($im, $niveau = 3) {
 
 	$x_i = $image['largeur'];
 	$y_i = $image['hauteur'];
-	$sum = pow(2, $niveau);
+	$sum = 2 ** $niveau;
 
 	$im = $image['fichier'];
 	$dest = $image['fichier_dest'];
@@ -1377,10 +1380,10 @@ function dimensions_rotation_image($angle, $width, $height, $center_x = null, $c
 			$corners[$key] = $temp;
 		}
 
-		$min_x = 1000000000000000;
-		$max_x = -1000000000000000;
-		$min_y = 1000000000000000;
-		$max_y = -1000000000000000;
+		$min_x = 1_000_000_000_000_000;
+		$max_x = -1_000_000_000_000_000;
+		$min_y = 1_000_000_000_000_000;
+		$max_y = -1_000_000_000_000_000;
 
 		foreach ($corners as $key => $value) {
 			if ($value[0] < $min_x) {
@@ -1422,7 +1425,7 @@ function image_RotateBicubic($src_img, $angle, $bicubic = false) {
 	$center_x = floor(($src_x - 1) / 2);
 	$center_y = floor(($src_y - 1) / 2);
 
-	list($rotate_width, $rotate_height, $droit) = dimensions_rotation_image($angle, $src_x, $src_y, $center_x, $center_y);
+	[$rotate_width, $rotate_height, $droit] = dimensions_rotation_image($angle, $src_x, $src_y, $center_x, $center_y);
 
 	$rotate = imagecreatetruecolor($rotate_width, $rotate_height);
 	imagealphablending($rotate, false);
@@ -1563,7 +1566,7 @@ function image_rotation($im, $angle, $crop = false) {
 		if ($image['format_source'] === 'svg') {
 			$center_x = floor(($image['largeur'] - 1) / 2);
 			$center_y = floor(($image['hauteur'] - 1) / 2);
-			list($rotate_width, $rotate_height, $droit) = dimensions_rotation_image($angle, $image['largeur'], $image['hauteur'], $center_x, $center_y);
+			[$rotate_width, $rotate_height, $droit] = dimensions_rotation_image($angle, $image['largeur'], $image['hauteur'], $center_x, $center_y);
 			$svg = svg_recadrer($im, $rotate_width, $rotate_height, -round(($rotate_width - $image['largeur']) / 2), -round(($rotate_height - $image['hauteur']) / 2));
 			$svg = svg_rotate($svg, $angle, 0.5, 0.5);
 			_image_gd_output($svg, $image);
@@ -1571,7 +1574,7 @@ function image_rotation($im, $angle, $crop = false) {
 		else {
 			$effectuer_gd = true;
 
-			if (method_exists('Imagick', 'rotateImage')) {
+			if (method_exists(\Imagick::class, 'rotateImage')) {
 				$imagick = new Imagick();
 				$imagick->readImage($im);
 				$imagick->rotateImage(new ImagickPixel('none'), $angle);
@@ -1625,7 +1628,7 @@ function image_rotation($im, $angle, $crop = false) {
 			}
 		}
 	}
-	list($src_y, $src_x) = taille_image($dest);
+	[$src_y, $src_x] = taille_image($dest);
 
 	return _image_ecrire_tag($image, ['src' => $dest, 'width' => $src_x, 'height' => $src_y]);
 }
@@ -1635,6 +1638,7 @@ function image_rotation($im, $angle, $crop = false) {
 // liste des fonctions: http://www.linux-nantes.org/~fmonnier/doc/imagick/
 // https://code.spip.net/@image_imagick
 function image_imagick() {
+	$arr = [];
 	$tous = func_get_args();
 	$img = $tous[0];
 	$fonc = $tous[1];
@@ -1653,7 +1657,7 @@ function image_imagick() {
 	$creer = $image['creer'];
 
 	if ($creer) {
-		if (method_exists('Imagick', $fonc)) {
+		if (method_exists(\Imagick::class, $fonc)) {
 			$imagick = new Imagick();
 			$imagick->readImage($im);
 			$args = $tous;
@@ -1672,7 +1676,7 @@ function image_imagick() {
 			_image_gd_output($handle, $image, _IMG_GD_QUALITE, '_image_imagick_write');
 		}
 	}
-	list($src_y, $src_x) = taille_image($dest);
+	[$src_y, $src_x] = taille_image($dest);
 
 	return _image_ecrire_tag($image, ['src' => $dest, 'width' => $src_x, 'height' => $src_y]);
 }
@@ -1871,6 +1875,7 @@ function image_sepia($im, $rgb = '896f5e') {
  * @return string Code HTML de l'image
  **/
 function image_renforcement($im, $k = 0.5) {
+	$rgb = [];
 	$fonction = ['image_flou', func_get_args()];
 	$image = _image_valeurs_trans($im, "renforcement-$k", false, $fonction);
 	if (!$image) {

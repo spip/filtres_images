@@ -32,6 +32,8 @@ function multiple_de_trois($val) {
  * @return array
  */
 function _couleur_rgb2hsv($R, $G, $B) {
+	$H = null;
+	$ret = [];
 	$var_R = ($R / 255);                    //Where RGB values = 0 Ã· 255
 	$var_G = ($G / 255);
 	$var_B = ($B / 255);
@@ -93,6 +95,7 @@ function _couleur_rgb2hsv($R, $G, $B) {
  */
 function _couleur_hsv2rgb($H, $S, $V) {
 
+	$ret = [];
 	if ($S == 0) {                       //HSV values = 0 Ã· 1
 	$R = $V * 255;
 		$G = $V * 255;
