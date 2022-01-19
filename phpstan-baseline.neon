@@ -116,11 +116,6 @@ parameters:
 			path: filtres/images_transforme.php
 
 		-
-			message: "#^Function imagick_rotate not found\\.$#"
-			count: 1
-			path: filtres/images_transforme.php
-
-		-
 			message: "#^Function imagick_setfillcolor not found\\.$#"
 			count: 1
 			path: filtres/images_transforme.php
@@ -266,12 +261,7 @@ parameters:
 			path: filtres/images_typo.php
 
 		-
-			message: "#^Undefined variable\\: \\$line$#"
-			count: 1
-			path: filtres/images_typo.php
-
-		-
 			message: "#^Function include_spip not found\\.$#"
-			count: 1
+			count: 2
 			path: images_fonctions.php
 
