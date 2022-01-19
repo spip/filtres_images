@@ -33,9 +33,7 @@ include_spip('inc/filtres_images_mini');
 // pour le format gif, $qualite correspond au nombre de couleurs dans la palette (defaut 128)
 // pour le format png, $qualite correspond au nombre de couleur dans la palette ou si 0 a une image truecolor (defaut truecolor)
 // attention, seul 128 est supporte en l'etat (production d'images avec palette reduite pas satisfaisante)
-// https://code.spip.net/@image_aplatir
 // 3/ $transparence a "true" permet de conserver la transparence (utile pour conversion GIF)
-// https://code.spip.net/@image_aplatir
 function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, $transparence = false) {
 	$transp_y = null;
 	if ($qualite === null) {
@@ -204,7 +202,6 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 // Enregistrer une image dans un format donne
 // (conserve la transparence gif, png, ico)
 // utilise [->@image_aplatir]
-// https://code.spip.net/@image_format
 function image_format($img, $format = 'png') {
 	$qualite = null;
 	if ($format == 'png8') {
@@ -219,7 +216,6 @@ function image_format($img, $format = 'png') {
 // Transforme l'image en PNG transparent
 // alpha = 0: aucune transparence
 // alpha = 127: completement transparent
-// https://code.spip.net/@image_alpha
 function image_alpha($im, $alpha = 63) {
 	$fonction = ['image_alpha', func_get_args()];
 	$image = _image_valeurs_trans($im, "alpha-$alpha", 'png', $fonction, false, _SVG_SUPPORTED);
@@ -585,7 +581,6 @@ function image_recadre_mini($im) {
 }
 
 
-// https://code.spip.net/@image_flip_vertical
 function image_flip_vertical($im) {
 	$fonction = ['image_flip_vertical', func_get_args()];
 	$image = _image_valeurs_trans($im, 'flip_v', false, $fonction, '', _SVG_SUPPORTED);
@@ -631,7 +626,6 @@ function image_flip_vertical($im) {
 	return _image_ecrire_tag($image, ['src' => $dest]);
 }
 
-// https://code.spip.net/@image_flip_horizontal
 function image_flip_horizontal($im) {
 	$fonction = ['image_flip_horizontal', func_get_args()];
 	$image = _image_valeurs_trans($im, 'flip_h', false, $fonction, '', _SVG_SUPPORTED);
@@ -675,7 +669,6 @@ function image_flip_horizontal($im) {
 	return _image_ecrire_tag($image, ['src' => $dest]);
 }
 
-// https://code.spip.net/@image_masque
 function image_masque($im, $masque, $pos = '') {
 	$defini = [];
 	$rgb3 = [];
@@ -1113,7 +1106,6 @@ function image_masque($im, $masque, $pos = '') {
 // un noir & blanc "photo" n'est pas "neutre": les composantes de couleur sont
 // ponderees pour obtenir le niveau de gris;
 // on peut ici regler cette ponderation en "pour mille"
-// https://code.spip.net/@image_nb
 function image_nb($im, $val_r = 299, $val_g = 587, $val_b = 114) {
 	$fonction = ['image_nb', func_get_args()];
 	$image = _image_valeurs_trans($im, "nb-$val_r-$val_g-$val_b", false, $fonction, false, _SVG_SUPPORTED);
@@ -1181,7 +1173,6 @@ function image_nb($im, $val_r = 299, $val_g = 587, $val_b = 114) {
 	return _image_ecrire_tag($image, ['src' => $dest]);
 }
 
-// https://code.spip.net/@image_flou
 function image_flou($im, $niveau = 3) {
 	// Il s'agit d'une modification du script blur qu'on trouve un peu partout:
 	// + la transparence est geree correctement
@@ -1416,7 +1407,6 @@ function dimensions_rotation_image($angle, $width, $height, $center_x = null, $c
 	return [$rotate_width, $rotate_height, $droit];
 }
 
-// https://code.spip.net/@image_RotateBicubic
 function image_RotateBicubic($src_img, $angle, $bicubic = false) {
 	include_spip('filtres/images_lib');
 
@@ -1545,7 +1535,6 @@ function image_RotateBicubic($src_img, $angle, $bicubic = false) {
 
 // permet de faire tourner une image d'un angle quelconque
 // la fonction "crop" n'est pas implementee...
-// https://code.spip.net/@image_rotation
 function image_rotation($im, $angle, $crop = false) {
 	$fonction = ['image_rotation', func_get_args()];
 	$image = _image_valeurs_trans($im, "rot-$angle-$crop", 'png', $fonction, false, _SVG_SUPPORTED);
@@ -1636,7 +1625,6 @@ function image_rotation($im, $angle, $crop = false) {
 // Permet d'appliquer un filtre php_imagick a une image
 // par exemple: [(#LOGO_ARTICLE|image_imagick{imagick_wave,20,60})]
 // liste des fonctions: http://www.linux-nantes.org/~fmonnier/doc/imagick/
-// https://code.spip.net/@image_imagick
 function image_imagick() {
 	$arr = [];
 	$tous = func_get_args();
@@ -1722,7 +1710,6 @@ function _image_imagick_write($imagick, $fichier, $qualite = _IMG_GD_QUALITE) {
 // Permet de rendre une image
 // plus claire (gamma > 0)
 // ou plus foncee (gamma < 0)
-// https://code.spip.net/@image_gamma
 function image_gamma($im, $gamma = 0) {
 	include_spip('filtres/images_lib');
 	$fonction = ['image_gamma', func_get_args()];
@@ -1789,7 +1776,6 @@ function image_gamma($im, $gamma = 0) {
 // On peut fixer les valeurs RGB
 // de la couleur "complementaire" pour forcer une dominante
 //function image_sepia($im, $dr = 137, $dv = 111, $db = 94)
-// https://code.spip.net/@image_sepia
 function image_sepia($im, $rgb = '896f5e') {
 	include_spip('filtres/images_lib');
 
