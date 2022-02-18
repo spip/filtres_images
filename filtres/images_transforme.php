@@ -49,13 +49,13 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 
 	$fonction = ['image_aplatir', func_get_args()];
 	$image = _image_valeurs_trans($im, "aplatir-$format-$coul-$qualite-$transparence", $format, $fonction, '', _SVG_SUPPORTED);
+	if (!$image) {
+		return ('');
+	}
+
 	if ($image['format_source'] === 'svg') {
 		// ne pas forcer le format
 		$image = _image_valeurs_trans($im, "aplatir-$format-$coul-$qualite-$transparence", false, $fonction, '', _SVG_SUPPORTED);
-	}
-
-	if (!$image) {
-		return ('');
 	}
 
 	include_spip('inc/filtres');
