@@ -3,7 +3,7 @@
 	categorie="multimedia"
 	version="4.0.1"
 	etat="stable"
-	compatibilite="[4.1.0-alpha;4.1.*]"
+	compatibilite="[4.1.0;4.1.*]"
 	logo="images/image_filtre-xx.svg"
 >
 
