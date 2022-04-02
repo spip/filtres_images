@@ -53,7 +53,7 @@ function image_aplatir($im, $format = 'jpg', $coul = '000000', $qualite = null, 
 	if (!$image) {
 		return ('');
 	}
-	if (is_array($image) and isset($image['format_source']) and $image['format_source'] === 'svg') {
+	if (isset($image['format_source']) and $image['format_source'] === 'svg') {
 		// ne pas forcer le format
 		$image = _image_valeurs_trans($im, "aplatir-$format-$coul-$qualite-$transparence", false, $fonction, '', _SVG_SUPPORTED);
 	}
