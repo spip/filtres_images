@@ -133,8 +133,8 @@ function couleur_saturation($couleur, $val, $strict = false) {
 	// Soit on ne change que la saturation
 	if ($strict) {
 		$old_rgb         = _couleur_hex_to_dec($couleur);
-		$hsl             = _couleur_rgb2hsl($old_rgb['red'], $old_rgb['green'], $old_rgb['blue']);
-		$rgb             = _couleur_hsl2rgb($hsl['h'], floatval($val), $hsl['l']);
+		$hsl             = _couleur_rgb_to_hsl($old_rgb['red'], $old_rgb['green'], $old_rgb['blue']);
+		$rgb             = _couleur_hsl_to_rgb($hsl['h'], floatval($val), $hsl['l']);
 		[$r, $g, $b] = array_values($rgb);
 
 	// Soit on joue sur la saturation et la luminosité
@@ -196,12 +196,12 @@ function couleur_luminance($couleur, $val) {
 	}
 
 
-	$couleur = _couleur_rgb2hsl($r, $g, $b);
+	$couleur = _couleur_rgb_to_hsl($r, $g, $b);
 	$h = $couleur['h'];
 	$s = $couleur['s'];
 	$l = $couleur['l'];
 
-	$rgb = _couleur_hsl2rgb($h, $s, 1 - $val);
+	$rgb = _couleur_hsl_to_rgb($h, $s, 1 - $val);
 	$r = $rgb['r'];
 	$g = $rgb['g'];
 	$b = $rgb['b'];
