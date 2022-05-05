@@ -146,9 +146,9 @@ function couleur_saturation($couleur, $val, $strict = false) {
 
 		$max = max($r, $g, $b, 1);
 
-		$r = 255 - $r / $max * 255 * $val;
-		$g = 255 - $g / $max * 255 * $val;
-		$b = 255 - $b / $max * 255 * $val;
+		$r = 255 - intval($r / $max * 255 * $val);
+		$g = 255 - intval($g / $max * 255 * $val);
+		$b = 255 - intval($b / $max * 255 * $val);
 	}
 
 	$couleur = _couleur_dec_to_hex($r, $g, $b);
