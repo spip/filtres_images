@@ -1923,9 +1923,9 @@ function image_renforcement($im, $k = 0.5) {
 					-$k * ($rgb[2][1] & 0xFF) +
 					-$k * ($rgb[1][2] & 0xFF);
 
-				$r = min(255, max(0, $r));
-				$g = min(255, max(0, $g));
-				$b = min(255, max(0, $b));
+				$r = min(255, max(0, intval($r)));
+				$g = min(255, max(0, intval($g)));
+				$b = min(255, max(0, intval($b)));
 
 
 				$color = ImageColorAllocateAlpha($im_, $r, $g, $b, $a);
