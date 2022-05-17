@@ -6,6 +6,10 @@
 
 - Fichier `CHANGELOG.md`
 
+### Fixed
+
+- #4694 Warning en moins sur image_typo quand aucune couleur n'est passée en paramètre
+
 
 ## [4.0.2] - 2022-03-25
 
