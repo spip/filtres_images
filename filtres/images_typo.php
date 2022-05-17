@@ -699,7 +699,12 @@ function produire_image_typo() {
 		$taille = 16;
 	}
 
-	$couleur = couleur_html_to_hex($variable['couleur']);
+	if (isset($variable['couleur'])) {
+		$couleur = couleur_html_to_hex($variable['couleur']);
+	} else {
+		$couleur = '';
+	}
+
 	if (strlen($couleur) < 6) {
 		$couleur = '000000';
 	}
