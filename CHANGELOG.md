@@ -1,0 +1,27 @@
+# Changelog
+
+## [Unreleased]
+
+## Added
+
+- Fichier `CHANGELOG.md`
+
+
+## [4.0.2] - 2022-03-25
+
+### Changed
+
+- Compatible SPIP 4.1.0 minimum
+
+
+## [4.0.1] - 2022-03-05
+
+### Fixed
+
+- Warning dans `image_aplatir` en absence d’image source
+
+
+## [4.0.0] - 2022-02-08
+
+- Nécessite SPIP 4.1-alpha minimum
+- Nécessite PHP 7.4 minimum
