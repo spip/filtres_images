@@ -1,7 +1,7 @@
 <paquet
 	prefix="images"
 	categorie="multimedia"
-	version="3.0.3"
+	version="3.0.4"
 	etat="stable"
 	compatibilite="[4.0.0;4.0.*]"
 	logo="images/image_filtre-xx.svg"
