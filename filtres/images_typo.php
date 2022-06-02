@@ -530,16 +530,16 @@ function printWordWrapped(
 	// calculer les couleurs ici, car fonctionnement different selon TTF ou PS
 	$black = imagecolorallocatealpha(
 		$image,
-		hexdec('0x{' . substr($couleur, 0, 2) . '}'),
-		hexdec('0x{' . substr($couleur, 2, 2) . '}'),
-		hexdec('0x{' . substr($couleur, 4, 2) . '}'),
+		hexdec(substr($couleur, 0, 2)),
+		hexdec(substr($couleur, 2, 2)),
+		hexdec(substr($couleur, 4, 2)),
 		0
 	);
 	$grey2 = imagecolorallocatealpha(
 		$image,
-		hexdec('0x{' . substr($couleur, 0, 2) . '}'),
-		hexdec('0x{' . substr($couleur, 2, 2) . '}'),
-		hexdec('0x{' . substr($couleur, 4, 2) . '}'),
+		hexdec(substr($couleur, 0, 2)),
+		hexdec(substr($couleur, 2, 2)),
+		hexdec(substr($couleur, 4, 2)),
 		127
 	);
 
@@ -789,9 +789,9 @@ function produire_image_typo() {
 
 			$grey2 = imagecolorallocatealpha(
 				$im,
-				hexdec('0x{' . substr($couleur, 0, 2) . '}'),
-				hexdec('0x{' . substr($couleur, 2, 2) . '}'),
-				hexdec('0x{' . substr($couleur, 4, 2) . '}'),
+				hexdec(substr($couleur, 0, 2)),
+				hexdec(substr($couleur, 2, 2)),
+				hexdec(substr($couleur, 4, 2)),
 				127
 			);
 			ImageFilledRectangle($im, 0, 0, $largeur_reelle + (2 * $padding), $hauteur + 5 + (2 * $padding), $grey2);
