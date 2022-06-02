@@ -1086,7 +1086,7 @@ function image_masque($im, $masque, $pos = '') {
 					$a_ = $a + $a2 - round($a * $a2 / 127);
 				}
 
-				$color = ImageColorAllocateAlpha($im_, $r_, $g_, $b_, $a_);
+				$color = ImageColorAllocateAlpha($im_, intval($r_), intval($g_), intval($b_), $a_);
 				imagesetpixel($im_, $x, $y, $color);
 			}
 		}
