@@ -759,6 +759,9 @@ function produire_image_typo() {
 				spip_log(_T('fichier_introuvable', ['fichier' => $police]));
 				$font = find_in_path('polices/' . 'dustismo.ttf');
 			}
+			
+			// Normalisation du chemin de la police en chemin absolu (pour Windows cf https://bugs.php.net/bug.php?id=75656)
+			$font = realpath($font);
 
 			$imgbidon = imageCreateTrueColor($largeur, 45);
 			$retour = printWordWrapped(
